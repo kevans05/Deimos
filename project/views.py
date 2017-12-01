@@ -9,10 +9,6 @@ def index():
                            title='Home')
 @app.route('/newStaff')
 def newStaff():
-    db = dataset.connect('sqlite:///mydatabase.db')
-
-    table = db['sometable']
-    table.insert(dict(name='John fuck', age=37))
     return render_template('staffNew.html',
                            title='New Staff')
 
