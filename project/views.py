@@ -1,6 +1,5 @@
 from . import app
 from flask import render_template, request, redirect
-
 import dataset
 
 @app.route('/')
@@ -10,16 +9,17 @@ def index():
                            title='Home')
 @app.route('/newStaff')
 def newStaff():
+    db = dataset.connect('sqlite:///mydatabase.db')
+
+    table = db['sometable']
+    table.insert(dict(name='John fuck', age=37))
     return render_template('staffNew.html',
-                           title='about', page='about')
+                           title='New Staff')
 
 @app.route('/handleNewStaff', methods=['POST'])
 def handleNewStaff():
-    db = dataset.connect('sqlite:///mydatabase.db')
-    table = db['CDMUsers']
-    table.insert(dict(firstName="xx"))
     if request.method == 'POST':
-        print(request.form['inputFirstName'])
+        print('x')
        #'table.insert(dict(firstName=request.form['inputFirstName'], lastName=request.form['inputLastName'], email=request.form['inputEmail'], tel=request.form['inputPhoneNumber']))
     return redirect('/')
 
