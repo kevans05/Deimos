@@ -2,28 +2,28 @@
 {% block content %}
 <div class="container-fluid">
     <div class="jumbotron">
-      <h1 class="display-3">About</h1>
-      <p class="lead">This was developed by Kyle J Evans well emplyed at London Hydro as an alternative to the current Tailboard Sheet that London Hydro used.</p>
-      <hr class="my-4">
-      <h1 Class="display-3">License</h1>
-      <p class="lead">
-        Copyright 2017 Kyle J. Evans - London Hydro Inc
-      </p>
-      <p class="lead">
-        Licensed under the Apache License, Version 2.0 (the "License");
-        you may not use this file except in compliance with the License.
-        You may obtain a copy of the License at
-      </p>
-      <p class="lead">
-         http://www.apache.org/licenses/LICENSE-2.0
-      </p>
-      <p class="lead">
-        Unless required by applicable law or agreed to in writing, software
-        distributed under the License is distributed on an "AS IS" BASIS,
-        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        See the License for the specific language governing permissions and
-        limitations under the License.
-      </p>
+        <h1 class="display-3">Create A New Staff Member</h1>
+        <p class="lead">Enter a new department member to be included on the on-line tailboard</p>
+        <hr class="my-4">
+            <form action="{{ url_for('handleNewStaff') }}" method="post">
+                <div class="form-group">
+                    <label for="inputFirstName">First Name:</label>
+                    <input type="text" class="form-control" id="inputFirstName" name="inputFirstName" aria-describedby="fistName" placeholder="Jane" required>
+                 </div>
+                <div class="form-group">
+                    <label for="inputLastName">Last Name:</label>
+                    <input type="text" class="form-control" id="inputLastName" name="inputLastName" aria-describedby="lastName" placeholder="Doe" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail">Email:</label>
+                    <input type="email" class="form-control" id="inputEmail" name="inputEmail" aria-describedby="email" placeholder="doej@londonhydro.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputPhoneNumber">Phone Number:</label>
+                    <input type="tel" class="form-control" id="inputPhoneNumber" name="inputPhoneNumber" aria-describedby="phoneNumber" placeholder="5196615800" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+            </form>
     </div>
 </div>
 {% endblock %}
