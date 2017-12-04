@@ -35,8 +35,8 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuStaff">
                             <a class="dropdown-item" href="{{ url_for('newStaff') }}">New Staff</a>
-                            <a class="dropdown-item" href="#">Remove Staff</a>
-                            <a class="dropdown-item" href="#">Edit Staff</a>
+                            <a class="dropdown-item" href="{{ url_for('removeStaff') }}">Remove Staff</a>
+                            <a class="dropdown-item" href="{{ url_for('editStaff') }}">Edit Staff</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -44,9 +44,9 @@
                             Vehicle
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuvehicle">
-                            <a class="dropdown-item" href="#">New Vehicle</a>
-                            <a class="dropdown-item" href="#">Remove Vehicle</a>
-                            <a class="dropdown-item" href="#">Edit Vehicle</a>
+                            <a class="dropdown-item" href="{{ url_for('newVehicle') }}">New Vehicle</a>
+                            <a class="dropdown-item" href="{{ url_for('removeVehicle') }}">Remove Vehicle</a>
+                            <a class="dropdown-item" href="{{ url_for('editVehicle') }}">Edit Vehicle</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">

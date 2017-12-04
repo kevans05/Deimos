@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="jumbotron">
+        <h1 class="display-3">Create A New Vehicle</h1>
+        <p class="lead">Enter a new department member to be included on the on-line tailboard</p>
+        <hr class="my-4">
+            <form action="{{ url_for('handleNewVehicle') }}" method="post">
+                <div class="form-group">
+                    <label for="inputNickname">Nickname:</label>
+                    <input type="text" class="form-control" id="inputNickname" name="inputNickname" aria-describedby="nickname" placeholder="Hyperion" required>
+                 </div>
+                <div class="form-group">
+                    <label for="inputCorporationID">Corporation ID:</label>
+                    <input type="number" class="form-control" id="inputCorporationID" name="inputCorporationID" aria-describedby="CorporationID" placeholder="3.4" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputMake">Make:</label>
+                    <input type="text" class="form-control" id="inputMake" name="inputMake" aria-describedby="make" placeholder="Anvil Aerospace" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputModel">Phone Number:</label>
+                    <input type="text" class="form-control" id="inputModel" name="inputModel" aria-describedby="model" placeholder="Hurricane" required>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+            </form>
+    </div>
+</div>
+{% endblock %}
