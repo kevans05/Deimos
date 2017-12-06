@@ -10,7 +10,7 @@
                 <select class="form-control" id="editVehicle" name="editVehicle" onchange="myFunction()">
                     <option>------------------------------------</option>
                      {% for o in vehicle %}
-                          <option value={{ o.id }};{{ o.nickname }};{{ o.corporationID }};{{ o.make }};{{ o.model }};{{ o.enabled }}>{{ o.nickname }} - {{ o.corporationID }} - {{ o.make }} {{ o.model }}  </option>
+                          <option value={{ o.id }};{{ o.enabled }};{{ o.nickname }};{{ o.corporationID }};{{ o.make }};{{ o.model }};{{ o.enabled }};>{{ o.nickname }} - {{ o.corporationID }} - {{ o.make }} {{ o.model }}</option>
                     {% endfor %}
                 </select>
                 <br>
@@ -30,17 +30,17 @@
                     </div>
                     <div class="form-group">
                         <label for="inputMake">Make:</label>
-                        <input type="email" class="form-control" id="inputMake" name="inputMake" aria-describedby="inputMake" placeholder="Anvil Aerospace" required>
+                        <input type="text" class="form-control" id="inputMake" name="inputMake" aria-describedby="inputMake" placeholder="Anvil Aerospace" required>
                     </div>
                     <div class="form-group">
                         <label for="inputModel">Model:</label>
-                        <input type="tel" class="form-control" id="inputModel" name="inputModel" aria-describedby="inputModel" placeholder="Hurricane" required>
+                        <input type="text" class="form-control" id="inputModel" name="inputModel" aria-describedby="inputModel" placeholder="Hurricane" required>
                     </div>
                     <div class="form-group">
                         <label for="inputEnabled">Active Vehicle</label>
-                        <select class="form-control" name="activeVehicle" id="inputActive">
-                            <option value=True>True</option>
-                            <option value=False>False</option>
+                        <select class="form-control" name="inputActive" id="inputActive">
+                            <option value=0>False</option>
+                            <option value=1>True</option>
                         </select>
                     </div>
                     <hr class="my-4">
