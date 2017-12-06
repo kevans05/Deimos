@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="jumbotron">
+            <h1 class="display-3">Create A New Tailboard</h1>
+            <p class="lead">Please enter the following information to create a new Tailboard</p>
+            <hr class="my-4">
+                <form action="{{ url_for('handleNewTailboard') }}" method="post">
+                    <div class="form-group">
+                        <label for="presentStaff">Please select the staff that will be included on this tailboard:</label>
+                        <select multiple class="form-control" id="presentStaff" name="presentStaff">
+
+
+                        </select>
+                     </div>
+                    <div class="form-group">
+                        <label for="inputFirstName">Please select the vehicles that will be included on this tailboard:</label>
+                        <select multiple class="form-control" id="presentVehicles" name="presentVehicles">
+
+
+                        </select>
+                     </div>
+                    <div class="form-group">
+                        <label class="form-check-label" for="presentDangers">Please select the Present Dangers on site, If you do not see a current danger please select other and add the new dangers with a ; between each point</label>
+                        <select multiple class="form-control" id="presentDangers" name="presentDangers">
+
+
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-check-label" for="location">Please eneter the location that this tailboard will cover</label>
+                        <input type="text" class="form-control" id="location" name="location">
+                     </div>
+                    <div class="form-group">
+                        <label for="">Please describe the job steps that will be taken in text or with a voice recoding:</label>
+                        <textarea rows="5" class="form-control" id="jobSteps" name="jobSteps" aria-describedby="jobSteps" required></textarea>
+                        <br>
+                        <button type="button" class="btn btn-info" style="width: 100%">Record Audio <img src="/static/svg/unmute.svg" width="30" height="30" class="d-inline-block align-top" alt=""></button>
+                    </div>
+                     <div class="form-group">
+                        <label for="">Please describe the job steps that will be taken in text or with a voice recoding:</label>
+                        <textarea rows="5" class="form-control" id="jobSteps" name="jobSteps" aria-describedby="jobSteps" required></textarea>
+                         <br>
+                        <button type="button" class="btn btn-info" style="width: 100%">Record Audio <img src="/static/svg/unmute.svg" width="30" height="30" class="d-inline-block align-top" alt=""></button>
+                    </div>
+                     <div class="form-group">
+                        <label for="">Please describe the job steps that will be taken in text or with a voice recoding:</label>
+                        <textarea rows="5" class="form-control" id="jobSteps" name="jobSteps" aria-describedby="jobSteps" required></textarea>
+                         <br>
+                        <button type="button" class="btn btn-info" style="width: 100%">Record Audio <img src="/static/svg/unmute.svg" width="30" height="30" class="d-inline-block align-top" alt=""></button>
+                    </div>
+                    <hr class="my-4">
+                    <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+                </form>
+        </div>
+    </div>
+{% endblock %}

@@ -7,6 +7,15 @@ import dataset
 def index():
     return render_template('index.html',
                            title='Home')
+
+@app.route('/newTailboard')
+def newTailboard():
+    return render_template('newTailboard.html')
+
+@app.route('/handleNewTailboard', methods=['POST'])
+def handleNewTailboard():
+    if request.method == 'POST':
+       redirect('/')
 @app.route('/newStaff')
 def newStaff():
     return render_template('staffNew.html',
@@ -17,7 +26,6 @@ def handleNewStaff():
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['staff']
         table.insert(dict(firstName=request.form['inputFirstName'], lastName=request.form['inputLastName'], email=request.form['inputEmail'], tel=request.form['inputPhoneNumber'],enabled=1))
-
     return redirect('/')
 
 @app.route('/removeStaff')
@@ -26,7 +34,7 @@ def removeStaff():
     table = db['staff']
     staff = table.find(enabled=1)
     return render_template('staffRemove.html',
-                           title='New Staff',staff=staff)
+                           title='New Staff', staff=staff)
 
 @app.route('/handleRemoveStaff', methods=['POST'])
 def handleRemoveStaff():
@@ -65,7 +73,6 @@ def handleNewVehicle():
         table.insert(dict(nickname=request.form['inputNickname'],
                           corporationID=request.form['inputCorporationID'], make=request.form['inputMake'],
                           model=request.form['inputModel'],enabled=1))
-
     return redirect('/')
 
 @app.route('/removeVehicle')
