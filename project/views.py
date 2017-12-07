@@ -10,12 +10,15 @@ def index():
 
 @app.route('/newTailboard')
 def newTailboard():
-    return render_template('newTailboard.html')
+    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+
+    return render_template('newTailboard.html', staff=db['staff'].find(enabled=1),vehicle=db['vehicle'].find(enabled=1))
 
 @app.route('/handleNewTailboard', methods=['POST'])
 def handleNewTailboard():
     if request.method == 'POST':
        redirect('/')
+
 @app.route('/newStaff')
 def newStaff():
     return render_template('staffNew.html',
@@ -107,6 +110,11 @@ def handleEditVehicle():
                           corporationID=request.form['inputCorporationID'], make=request.form['inputMake'],
                           model=request.form['inputModel'],enabled=['activeVehicle']), ['id'])
     return redirect('/')
+
+@app.route('/archives')
+def archives():
+    return render_template('archives.html',
+                           title='archives', page='archives')
 
 @app.route('/about')
 def about():
