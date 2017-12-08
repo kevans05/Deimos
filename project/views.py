@@ -1,5 +1,7 @@
 from . import app
 from flask import render_template, request, redirect
+from time import time
+
 import dataset
 
 @app.route('/')
@@ -11,13 +13,23 @@ def index():
 @app.route('/newTailboard')
 def newTailboard():
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-
     return render_template('newTailboard.html', staff=db['staff'].find(enabled=1),vehicle=db['vehicle'].find(enabled=1))
 
 @app.route('/handleNewTailboard', methods=['POST'])
 def handleNewTailboard():
+    jobID = int(time())
+
     if request.method == 'POST':
-       redirect('/')
+        tailboard = request.form.to_dict(flat=False)
+        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+        table = db['tailboard']
+        tailboardDict = {'jobID':jobID}
+        for key, values in tailboard.items():
+            x = ';'.join(values)
+            print(key, x)
+        print(tailboardDict)
+
+    return redirect('/')
 
 @app.route('/newStaff')
 def newStaff():
@@ -28,14 +40,14 @@ def handleNewStaff():
     if request.method == 'POST':
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['staff']
-        table.insert(dict(firstName=request.form['inputFirstName'], lastName=request.form['inputLastName'], email=request.form['inputEmail'], tel=request.form['inputPhoneNumber'],enabled=1))
+        table.insert(dict(firstName=request.form['inputFirstName'], lastName=request.form['inputLastName'], email=request.form['inputEmail'], tel=request.form['inputPhoneNumber'],enabled=True))
     return redirect('/')
 
 @app.route('/removeStaff')
 def removeStaff():
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
     table = db['staff']
-    staff = table.find(enabled=1)
+    staff = table.find(enabled=True)
     return render_template('staffRemove.html',
                            title='New Staff', staff=staff)
 
@@ -45,7 +57,7 @@ def handleRemoveStaff():
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['staff']
         for x in request.form.getlist('removeStaff'):
-            table.update(dict(id=x,enabled=0),['id'])
+            table.update(dict(id=x,enabled=False),['id'])
     return redirect('/')
 
 @app.route('/editStaff')
@@ -60,7 +72,7 @@ def handleEditStaff():
     if request.method == 'POST':
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['staff']
-        table.update(dict(id=request.form['inputid'], firstName=request.form['inputFirstName'],lastName=request.form['inputLastName'], email=request.form['inputEmail'],tel=request.form['inputPhoneNumber'],enabled=['activeStaff']), ['id'])
+        table.update(dict(id=request.form['inputid'], firstName=request.form['inputFirstName'],lastName=request.form['inputLastName'], email=request.form['inputEmail'],tel=request.form['inputPhoneNumber'],enabled=['activeStaff']), request.form['inputid'])
     return redirect('/')
 
 @app.route('/newVehicle')
@@ -72,17 +84,16 @@ def handleNewVehicle():
     if request.method == 'POST':
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['vehicle']
-        print(request.form)
         table.insert(dict(nickname=request.form['inputNickname'],
                           corporationID=request.form['inputCorporationID'], make=request.form['inputMake'],
-                          model=request.form['inputModel'],enabled=1))
+                          model=request.form['inputModel'],enabled=True))
     return redirect('/')
 
 @app.route('/removeVehicle')
 def removeVehicle():
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
     table = db['vehicle']
-    vehicle = table.find(enabled=1)
+    vehicle = table.find(enabled=True)
     return render_template('vehicleRemove.html',
                            title='New Vehicle',vehicle=vehicle)
 
@@ -92,7 +103,7 @@ def handleRemoveVehicle():
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['vehicle']
         for x in request.form.getlist('removeVehicle'):
-            table.update(dict(id=x,enabled=0),['id'])
+            table.update(dict(id=x,enabled=False),['id'])
     return redirect('/')
 
 @app.route('/editVehicle')

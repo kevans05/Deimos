@@ -1,6 +1,5 @@
 function myFunction() {
     var str=document.getElementById('editStaff').value.split(";")
-
     document.getElementById("id").value = str[0];
     document.getElementById("inputid").value = str[0];
     document.getElementById("inputFirstName").value = str[1];
