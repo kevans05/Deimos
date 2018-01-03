@@ -1,0 +1,178 @@
+<!doctype html>
+{% if title %}
+        <title>{{ title }} - Deimos</title>
+    {% else %}
+        <title>Deimos</title>
+{% endif %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.3.0/paper.css">
+<!-- Load paper.css for happy printing -->
+<link rel="stylesheet" href="dist/paper.css">
+
+<!-- Set page size here: A5, A4 or A3 -->
+<!-- Set also "landscape" if you need -->
+<style>@page { size: A5 }</style>
+<body class="A5">
+
+<!-- Each sheet element should have the class "sheet" -->
+<!-- "padding-**mm" is optional: you can set 10, 15, 20 or 25 -->
+<section class="sheet padding-10mm">
+
+    <!-- Write HTML just like a web page -->
+    <center><h1>Tailboard Report</h1></center>
+    <table style="width: 100%">
+        <tr>
+            <td><p><strong>Date: </strong><i> {{ tailboardData.jobDate }}</i></p></td>
+            <td><p><strong>Job ID:</strong><i> {{ tailboardData.jobID }}</i></p></td>
+            <td><p><strong>Job Location:</strong><i> {{ tailboardData.location }}</i></p></td>
+        </tr>
+    </table>
+
+    <style type="text/css">
+    .tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;width: 100%}
+    .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;border-top-width:1px;border-bottom-width:1px;}
+    .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color: #b20838;border-top-width:1px;border-bottom-width:1px;}
+    .tg .tg-hgcj{font-weight:bold;text-align:center}
+    </style>
+
+    <table class="tg">
+        <tr>
+            <th class="tg-hgcj" colspan="4">Staff Present<br></th>
+        </tr>
+        {% for o in presentUserData %}
+        <tr>
+            <td class="tg-031e">{{ o.firstName }} {{ o.lastName }}</td>
+            <td class="tg-031e">{{ o.email }}</td>
+            <td class="tg-031e">666 666</td>
+            <td class="tg-031e" style="width: 5%"></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+{% if cuttingValueA  > 10 and cuttingValue <= 15 %}
+</section>
+<section class="sheet padding-10mm">
+{% endif %}
+    <table class="tg">
+        <tr>
+            <th class="tg-hgcj" colspan="4">Vehicles Present<br></th>
+        </tr>
+        {% for o in presentVehiclesData %}
+        <tr>
+            <td class="tg-031e" style="width: 40%">{{ o.corporationID }}</td>
+            <td class="tg-031e" style="width: 30%">{{ o.make }} {{ o.model }}</td>
+            <td class="tg-031e" style="width: 25%"><strong>AED Present:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if o.AED -%}&#10003; {% else %} &#10007; {%  endif %}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+{% if cuttingValueA  > 10 and cuttingValueA <= 15 %}
+</section>
+<section class="sheet padding-10mm">
+{% endif %}
+    <table class="tg">
+        <tr>
+            <th class="tg-hgcj" colspan="6">Voltage Present<br></th>
+        </tr>
+        <tr>
+            <td class="tg-031e" style="width: 28.33%"><strong>Grounded:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.ground %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 28.33%"><strong>Less Then or Equal To 750V:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.lessThen %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 28.33%"><strong>Greater Then 750V:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.greaterThen %}&#10003; {% else %} &#10007; {%  endif %}</td>
+        </tr>
+    </table>
+    <br>
+{% if cuttingValueA  > 5 and cuttingValueA <= 10 %}
+</section>
+<section class="sheet padding-10mm">
+{% endif %}
+    <table class="tg">
+        <tr>
+            <th class="tg-hgcj" colspan="10">Present Dangers Present<br></th>
+        </tr>
+        <tr>
+            <td class="tg-031e" style="width: 11.6%"><strong>Cold Meter:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.coldMeter %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 11.6%"><strong>Hot Meter:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.hotMeter %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 11.6%"><strong>TX Rated:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.txRated %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 11.6%"><strong>Testing:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.testing %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 11.6%"><strong>Site Visit:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.siteVisits %}&#10003; {% else %} &#10007; {%  endif %}</td>
+        </tr>
+        <tr>
+            <td class="tg-031e" style="width: 11.6%"><strong>Non Typical:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.nonTypical %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 11.6%"><strong> Heights:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.heights %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 11.6%"><strong>Weather Stress:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.weatherStresses %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 11.6%"><strong>Climbing Hazards:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.climbingHazards %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 11.6%"><strong>Confined Space:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.confinedSpace %}&#10003; {% else %} &#10007; {%  endif %}</td>
+        </tr>
+    </table>
+<br>
+{% if cuttingValueA  <= 5 %}
+</section>
+<section class="sheet padding-10mm">
+{% endif %}
+    <table class="tg">
+        <tr>
+            <th class="tg-hgcj" colspan="10">Controls/Barriers Present<br></th>
+        </tr>
+        <tr>
+            <td class="tg-031e" style="width: 11.6%"><strong>Rubber Gloves:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if controlsBarriersDic.rubberGloves %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 11.6%"><strong>Fall Protection:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if controlsBarriersDic.fallProtection %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 11.6%"><strong>Rescue Plan:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if controlsBarriersDic.rescuePlan %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 11.6%"><strong>Personal Protective Equipment:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if controlsBarriersDic.PPE %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 11.6%"><strong>Equipment Inspection:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if controlsBarriersDic.equipmentInspection %}&#10003; {% else %} &#10007; {%  endif %}</td>
+
+        </tr>
+        <tr>
+            <td class="tg-031e" style="width: 11.6%"><strong>Traffic Plan:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if controlsBarriersDic.trafficPlan %}&#10003; {% else %} &#10007; {%  endif %}</td>
+        </tr>
+    </table>
+    <h3>Job Steps:</h3>
+    <p>
+        {{ tailboardData.jobSteps }}
+    </p>
+
+    <h3>Hazards:</h3>
+    <p>
+        {{ tailboardData.hazards }}
+    </p>
+
+    <h3>Protections:</h3>
+    <p>
+        {{ tailboardData.barrriersMitigation }}
+    </p>
+
+</section>
+
+</body>

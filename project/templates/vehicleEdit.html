@@ -7,7 +7,7 @@
             <p class="lead">Select a department member to be removed from the on-line tailboard</p>
             <hr class="my-4">
                 <label for="editVehicle">Select the Vehicle to Edit</label>
-                <select class="form-control" id="editVehicle" name="editVehicle" onchange="myFunction()">
+                <select class="form-control" id="editVehicle" name="editVehicle" onchange="autoFillVehicle()">
                     <option>------------------------------------</option>
                      {% for o in vehicle %}
                           <option value={{ o.id }};{{ o.enabled }};{{ o.nickname }};{{ o.corporationID }};{{ o.make }};{{ o.model }};{{ o.enabled }};>{{ o.nickname }} - {{ o.corporationID }} - {{ o.make }} {{ o.model }}</option>
@@ -22,7 +22,7 @@
                      </div>
                     <div class="form-group">
                         <label for="inputNickname">Nickname:</label>
-                        <input type="text" class="form-control" id="inputNickname" name="inputNickname" aria-describedby="inputNickname" placeholder="Hyperion" required>
+                        <input type="text" class="form-control" id="inputNickname" name="inputNickname" aria-describedby="inputNickname" placeholder="Hyperion" onkeyup="this.value = this.value.replace(/[^a-z]/, '')" required>
                      </div>
                     <div class="form-group">
                         <label for="inputCorporationID">Corporation ID:</label>

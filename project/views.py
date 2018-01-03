@@ -1,8 +1,9 @@
 from . import app
-from flask import render_template, request, redirect
-from time import time
+from flask import render_template, request, redirect, make_response
+from time import time, strftime, localtime
 
 import dataset
+
 
 @app.route('/')
 @app.route('/index')
@@ -18,17 +19,16 @@ def newTailboard():
 @app.route('/handleNewTailboard', methods=['POST'])
 def handleNewTailboard():
     jobID = int(time())
-
+    jobDate = strftime('%Y-%m-%d', localtime(jobID))
     if request.method == 'POST':
         tailboard = request.form.to_dict(flat=False)
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['tailboard']
-        tailboardDict = {'jobID':jobID}
+        tailboardDict = {'jobID':jobID, 'jobDate':jobDate}
         for key, values in tailboard.items():
             x = ';'.join(values)
-            print(key, x)
-        print(tailboardDict)
-
+            tailboardDict.update({key:x})
+        table.insert(tailboardDict)
     return redirect('/')
 
 @app.route('/newStaff')
@@ -124,10 +124,58 @@ def handleEditVehicle():
 
 @app.route('/archives')
 def archives():
-    return render_template('archives.html',
-                           title='archives', page='archives')
+    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+    tailboardsTable = db['tailboard']
+    usersTable = db['Staff']
 
+    return render_template('archives.html',
+                           title='archives', page='archives', tailboards=tailboardsTable, users=usersTable)
+
+@app.route('/handleArchives/<tailboardID>')
+def handleArchives(tailboardID):
+    presentVoltageDic = {"ground": False, "lessThan": False, "greaterThen": False}
+
+    presentDangerDic = {"coldMeter": False, "hotMeter": False, "txRated": False, "testing": False, "siteVisits": False,
+                        "nonTypical": False, "heights": False, "weatherStresses": False, "climbingHazards": False,
+                        "confinedSpace": False}
+
+    controlsBarriersDic = {"rubberGloves": False, "fallProtection": False, "rescuePlan": False,
+                           "PPE": False, "equipmentInspection": False, "trafficPlan": False}
+
+    presentUserData = []
+    presentVehicleData = []
+
+    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+
+    tailboardData = db['tailboard'].find_one(jobID=tailboardID)
+    presentUsers = tailboardData['presentStaff'].split(";")
+    presentVehicles = tailboardData['presentVehicles'].split(";")
+
+    cuttingValueA = (len(presentUsers) + len(presentVehicles))
+
+    userData = db['staff']
+    for users in presentUsers:
+        presentUserData.append(userData.find_one(id=users))
+
+    vehicleData = db['vehicle']
+    for vehicle in presentVehicles:
+        presentVehicleData.append(vehicleData.find_one(id=vehicle))
+
+    for presentDangers in tailboardData['presentDangers'].split(';'):
+        presentDangerDic[presentDangers] = True
+
+    for presentVoltages in tailboardData['presentVoltages'].split(';'):
+        presentVoltageDic[presentVoltages] = True
+
+    for controlsBarriers in tailboardData['ControlsBarriers'].split(';'):
+        controlsBarriersDic[controlsBarriers] = True
+
+    return render_template('archiveOutput.html', tailboardData=tailboardData, presentUserData=presentUserData,
+                           presentVehiclesData=presentVehicleData, cuttingValueA=cuttingValueA,
+                           presentDangerDic=presentDangerDic,presentVoltageDic=presentVoltageDic,
+                           controlsBarriersDic=controlsBarriersDic,title=tailboardID, page=tailboardID)
 @app.route('/about')
 def about():
     return render_template('about.html',
                            title='about', page='about')
+
