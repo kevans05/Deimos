@@ -1,0 +1,148 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+{% if title %}
+    <title>{{ title }} - Deimos</title>
+{% else %}
+    <title>Deimos</title>
+{% endif %}
+<body>
+<!-- Write HTML just like a web page -->
+<center><h1>Tailboard Report</h1></center>
+<hr>
+<p><strong>Date: </strong><i> {{ tailboardData.jobDate }}</i></p>
+<p><strong>Job ID:</strong><i> {{ tailboardData.jobID }}</i></p>
+<p><strong>Job Location:</strong><i> {{ tailboardData.location }}</i></p>
+<hr>
+<p><strong>Staff Present</strong></p>
+
+<table>
+    {% for o in presentUserData %}
+        <tr>
+            <td style="width: 42.5%">{{ o.firstName }} {{ o.lastName }}</td>
+            <td style="width: 42.5%">{{ o.email }}</td>
+            <td style="width: 10%">666 666</td>
+            <td style="width: 5%">{% if o.present -%}&#10003; {% else %} &#10007; {%  endif %}</td>
+        </tr>
+    {% endfor %}
+</table>
+<hr>
+<p><strong>Vehicles Present</strong></p>
+<table>
+    {% for o in presentVehiclesData %}
+        <tr>
+            <td style="width: 25%">{{ o.corporationID }}</td>
+            <td style="width: 45%">{{ o.make }} {{ o.model }}</td>
+            <td style="width: 25%"><i>AED Present:</i></td>
+            <td style="width: 5%">{% if o.AED -%}&#10003; {% else %} &#10007; {% endif %}</td>
+        </tr>
+    {% endfor %}
+</table>
+<hr>
+<p><strong>Voltage Present</strong></p>
+<table>
+    <tr>
+        <td style="width: 28.33%"><i>Grounded:</i></td>
+        <td style="width: 5%">{% if presentVoltageDic.ground %}&#10003; {% else %} &#10007; {% endif %}</td>
+    </tr>
+    <tr>
+        <td style="width: 28.33%"><i>Less Then or Equal To 750V:</i></td>
+        <td style="width: 5%">{% if presentVoltageDic.lessThen %}&#10003; {% else %} &#10007; {% endif %}</td>
+    </tr>
+    <tr>
+        <td style="width: 28.33%"><i>Greater Then 750V:</i></td>
+        <td style="width: 5%">{% if presentVoltageDic.greaterThen %}&#10003; {% else %} &#10007; {% endif %}</td>
+    </tr>
+</table>
+<hr>
+<p><strong>Present Dangers Present</strong></p>
+<table>
+    <tr>
+        <td style="width: 11.6%"><i>Cold Meter:</i></td>
+        <td style="width: 5%">{% if presentDangerDic.coldMeter %}&#10003; {% else %} &#10007; {% endif %}</td>
+
+        <td style="width: 11.6%"><i>Hot Meter:</i></td>
+        <td style="width: 5%">{% if presentDangerDic.hotMeter %}&#10003; {% else %} &#10007; {% endif %}</td>
+    </tr>
+    <tr>
+        <td style="width: 11.6%"><i>TX Rated:</i></td>
+        <td style="width: 5%">{% if presentDangerDic.txRated %}&#10003; {% else %} &#10007; {% endif %}</td>
+
+        <td style="width: 11.6%"><i>Testing:</i></td>
+        <td style="width: 5%">{% if presentDangerDic.testing %}&#10003; {% else %} &#10007; {% endif %}</td>
+    </tr>
+    <tr>
+        <td style="width: 11.6%"><i>Site Visit:</i></td>
+        <td style="width: 5%">{% if presentDangerDic.siteVisits %}&#10003; {% else %} &#10007; {% endif %}</td>
+
+        <td style="width: 11.6%"><i>Non Typical:</i></td>
+        <td style="width: 5%">{% if presentDangerDic.nonTypical %}&#10003; {% else %} &#10007; {% endif %}</td>
+    </tr>
+    <tr>
+        <td style="width: 11.6%"><i> Heights:</i></td>
+        <td style="width: 5%">{% if presentDangerDic.heights %}&#10003; {% else %} &#10007; {% endif %}</td>
+
+        <td style="width: 11.6%"><i>Weather Stress:</i></td>
+        <td style="width: 5%">{% if presentDangerDic.weatherStresses %}&#10003; {% else %} &#10007; {% endif %}</td>
+    </tr>
+    <tr>
+        <td style="width: 11.6%"><i>Climbing Hazards:</i></td>
+        <td style="width: 5%">{% if presentDangerDic.climbingHazards %}&#10003; {% else %} &#10007; {% endif %}</td>
+
+        <td style="width: 11.6%"><i>Confined Space:</i></td>
+        <td style="width: 5%">{% if presentDangerDic.confinedSpace %}&#10003; {% else %} &#10007; {% endif %}</td>
+    </tr>
+</table>
+<hr>
+<p><strong>Controls/Barriers Present</strong></p>
+<table>
+    <tr>
+        <td style="width: 11.6%"><i>Rubber Gloves:</i></td>
+        <td style="width: 5%">{% if controlsBarriersDic.rubberGloves %}&#10003; {% else %} &#10007; {% endif %}</td>
+
+        <td style="width: 11.6%"><i>Fall Protection:</i></td>
+        <td style="width: 5%">{% if controlsBarriersDic.fallProtection %}&#10003; {% else %} &#10007; {% endif %}</td>
+    </tr>
+    <tr>
+        <td style="width: 11.6%"><i>Rescue Plan:</i></td>
+        <td style="width: 5%">{% if controlsBarriersDic.rescuePlan %}&#10003; {% else %} &#10007; {% endif %}</td>
+
+        <td style="width: 11.6%"><i>Personal Protective Equipment:</i></td>
+        <td style="width: 5%">{% if controlsBarriersDic.PPE %}&#10003; {% else %} &#10007; {% endif %}</td>
+    </tr>
+    <tr>
+        <td style="width: 11.6%"><i>Equipment Inspection:</i></td>
+        <td style="width: 5%">{% if controlsBarriersDic.equipmentInspection %}&#10003; {% else %}
+            &#10007; {% endif %}</td>
+
+    </tr>
+    <tr>
+        <td style="width: 11.6%"><i>Traffic Plan:</i></td>
+        <td style="width: 5%">{% if controlsBarriersDic.trafficPlan %}&#10003; {% else %} &#10007; {% endif %}</td>
+    </tr>
+</table>
+<hr>
+<h3>Job Steps:</h3>
+<p>
+    {{ tailboardData.jobSteps }}
+</p>
+<hr>
+<h3>Hazards:</h3>
+<p>
+    {{ tailboardData.hazards }}
+</p>
+<hr>
+<h3>Protections:</h3>
+<p>
+    {{ tailboardData.barrriersMitigation }}
+</p>
+<hr>
+<center>
+    <h4>
+        <p><i>By clicking the following link I </i><b>({{ firstName }} {{ lastName }})</b><i> agree that the information
+            in this tailboard is correct:</i></p>
+    </h4>
+    <h3><a href="{{ token }}">Submit as Correct</a></h3>
+    <p>{{ token }}</p>
+</center>
+</body>
+</html>
