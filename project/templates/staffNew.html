@@ -8,11 +8,15 @@
             <form action="{{ url_for('handleNewStaff') }}" method="post">
                 <div class="form-group">
                     <label for="inputFirstName">First Name:</label>
-                    <input type="text" class="form-control" id="inputFirstName" name="inputFirstName" aria-describedby="fistName" placeholder="Jane" required>
+                    <input type="text" class="form-control" id="inputFirstName" name="inputFirstName" aria-describedby="fistName" placeholder="Jane" onkeyup="this.value = this.value.replace(/[^A-z]/, '')" required>
                  </div>
                 <div class="form-group">
                     <label for="inputLastName">Last Name:</label>
-                    <input type="text" class="form-control" id="inputLastName" name="inputLastName" aria-describedby="lastName" placeholder="Doe" required>
+                    <input type="text" class="form-control" id="inputLastName" name="inputLastName" aria-describedby="lastName" placeholder="Doe" onkeyup="this.value = this.value.replace(/[^A-z]/, '')" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputCorpID">Corporate ID:</label>
+                    <input type="text" class="form-control" id="inputCorpID" name="inputCorpID" aria-describedby="inputCorpID" placeholder="666666" min="10000" max="99999" required>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail">Email:</label>

@@ -20,7 +20,7 @@
         <tr>
             <td style="width: 42.5%">{{ o.firstName }} {{ o.lastName }}</td>
             <td style="width: 42.5%">{{ o.email }}</td>
-            <td style="width: 10%">666 666</td>
+            <td style="width: 10%">{{ o.corporateID }}</td>
             <td style="width: 5%">{% if o.present -%}&#10003; {% else %} &#10007; {%  endif %}</td>
         </tr>
     {% endfor %}

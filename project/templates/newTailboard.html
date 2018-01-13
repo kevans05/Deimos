@@ -60,7 +60,12 @@
                     <div class="form-group">
                         <div class="locationField">
                             <label for="autocomplete">Please eneter the location that this tailboard will cover:</label>
-                            <input class="form-control" id="autocomplete" name="location" onfocus="geolocate()" autocomplete="off" type="text">
+                            <div class="input-group">
+                                <input class="form-control" id="autocomplete" name="location" onfocus="geolocate()" autocomplete="off" type="text">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-success" onclick="getLocation()"> Near Me </button>
+                                </span>
+                            </div>
                          </div>
                     </div>
                     <div class="form-group">
@@ -81,6 +86,8 @@
         </div>
     </div>
     <script src="/static/js/tailboardJS.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQpKEvZO_AooRB_G6cvKNtqh58Vj5ygOc&libraries=places&callback=initAutocomplete"
-        async defer></script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQpKEvZO_AooRB_G6cvKNtqh58Vj5ygOc&libraries=places&callback=initAutocomplete"
+    ></script>
+
 {% endblock %}

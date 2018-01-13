@@ -39,21 +39,20 @@ def new_tailboard_email(tailboardID):
     vehicleData = db['vehicle']
     for vehicle in presentVehicles:
         presentVehicleData.append(vehicleData.find_one(id=vehicle))
-
-    for presentDangers in tailboardData['presentDangers'].split(';'):
-        presentDangerDic[presentDangers] = True
-
-    for presentVoltages in tailboardData['presentVoltages'].split(';'):
-        presentVoltageDic[presentVoltages] = True
-
-    for controlsBarriers in tailboardData['ControlsBarriers'].split(';'):
-        controlsBarriersDic[controlsBarriers] = True
+    if tailboardData['presentDangers'] is not None:
+        for presentDangers in tailboardData['presentDangers'].split(';'):
+            presentDangerDic[presentDangers] = True
+    if tailboardData['presentDangers'] is not None:
+        for presentVoltages in tailboardData['presentVoltages'].split(';'):
+            presentVoltageDic[presentVoltages] = True
+    if tailboardData['ControlsBarriers'] is not None:
+        for controlsBarriers in tailboardData['ControlsBarriers'].split(';'):
+            controlsBarriersDic[controlsBarriers] = True
     for users in presentUserData:
         #tokenID = str(users['id']) str(tailboardID)
         token = generate_confirmation_token([users['id'],tailboardID])
         confirm_url = url_for('handleTailboardEmail', token=token, _external=True)
-
-        send_email("You have been included in Tailboard: %s" % tailboardID, "evansk@londonhydro.com",
+        send_email("You have been included in Tailboard: %s - %s" % (tailboardID, str(tailboardData['location'])), "evansk@londonhydro.com",
                    [users['email']], render_template('archiveOutputEmail.html', tailboardData=tailboardData,
                                                            presentUserData=presentUserData,
                                                            presentVehiclesData=presentVehicleData,

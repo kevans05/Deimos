@@ -1,28 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
-
+<script src="/static/js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="/static/js/archivesJS.js"></script>
+<link rel="stylesheet" href="static/css/style.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/css/style.css" crossorigin="anonymous">
 <div class="container-fluid">
     <div class="jumbotron">
         <h1 class="display-3">Archives</h1>
         <p class="lead">Please Select the Archived document you would like to read</p>
         <hr class="my-4">
-        <table style="width: 100%">
-            <tr>
-                <th>Tailboard ID<br></th>
-                <th>Date</th>
-                <th>Staff<br></th>
-                <th>Location<br></th>
-                <th>Print</th>
-            </tr>
-            {% for o in tailboards %}
-            <tr>
-                <td>{{ o.jobID }}</td>
-                <td>{{ o.jobDate }}</td>
-                <td>{{ o.presentStaff }}</td>
-                <td>{{ o.location }}</td>
-                <td><button type="button" class="btn btn-info" onclick="window.open('{{ url_for('handleArchives',tailboardID=o.jobID) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">Load</button></td>
-            </tr>
-            {% endfor %}
+        <input class="form-control" type="text" id="search" onkeyup="doSearch()" placeholder="Search the list..">
+        <br>
+        <table id="archiveInfo" class="tablesorter" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Tailboard ID<br></th>
+                    <th>Date</th>
+                    <th>Staff<br></th>
+                    <th>Location<br></th>
+                    <th>Print</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in tailboards %}
+                <tr>
+                    <td>{{ o.jobID }}</td>
+                    <td>{{ o.jobDate }}</td>
+                    <td>{{ o.presentStaff }}</td>
+                    <td>{{ o.location }}</td>
+                    <td><button type="button" class="btn btn-info" onclick="window.open('{{ url_for('handleArchives',tailboardID=o.jobID) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">Load</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
 </div>

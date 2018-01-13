@@ -21,7 +21,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg" href="/static/svg/rocket.svg">
 </head>
-<body>
+<body}>
 <div class="container-fluid">
     <nav class="navbar navbar-expand-lg navbar-light navbar-dark bg-primary">
         <a class="navbar-brand mb-0 h1" href="{{ url_for('index') }}">
@@ -61,12 +61,13 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuReports">
                             <a class="dropdown-item" href="{{ url_for('archives') }}">Tailboard Archives</a>
-                            <a class="dropdown-item" href="#">Statistics</a>
+                            <a class="dropdown-item" href="{{ url_for('exportDataBase') }}">Export Entire Database to Excel</a>
+                            <a class="dropdown-item disabled" href="#">Statistics</a>
                         </div>
                     </li>
                 </ul>
                 <ul class="nav navbar-nav">
-                    <a {% if page == 'tutorials' %}class="nav-item nav-link active" {% else %} class="nav-item nav-link" {% endif %} href="#">Tutorials</a>
+                    <a {% if page == 'tutorials' %}class="nav-item nav-link active" {% else %} class="nav-item nav-link disabled" {% endif %} href="#">Tutorials</a>
                     <a {% if page == 'about' %}class="nav-item nav-link active" {% else %} class="nav-item nav-link" {% endif %} href="{{ url_for('about') }}">About</a>
                 </ul>
             </div>
