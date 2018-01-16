@@ -21,7 +21,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg" href="/static/svg/rocket.svg">
 </head>
-<body}>
+<body>
 <div class="container-fluid">
     <nav class="navbar navbar-expand-lg navbar-light navbar-dark bg-primary">
         <a class="navbar-brand mb-0 h1" href="{{ url_for('index') }}">
@@ -56,6 +56,38 @@
                         </div>
                     </li>
                     <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuVoltages" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Voltages
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuVoltages">
+                            <a class="dropdown-item" href="#">New Voltage</a>
+                            <a class="dropdown-item" href="#">Remove Voltage</a>
+                            <a class="dropdown-item" href="#">Edit Voltages</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuPresentDangers" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Present Dangers
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuPresentDangers">
+                            <a class="dropdown-item" href="{{ url_for('newPresentDangers') }}">New Present Dangers</a>
+                            <a class="dropdown-item" href="{{ url_for('removePresentDangers') }}">Remove Present Dangers</a>
+                            <a class="dropdown-item" href="{{ url_for('editPresentDangers') }}">Edit Present Dangers</a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuControlsBarriers" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Controls/Barriers
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuControlsBarriers">
+                            <a class="dropdown-item" href="#">New Controls/Barriers</a>
+                            <a class="dropdown-item" href="#">Remove Controls/Barriers</a>
+                            <a class="dropdown-item" href="#">Edit Controls/Barriers</a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuReports" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Reports
                         </a>
@@ -63,6 +95,14 @@
                             <a class="dropdown-item" href="{{ url_for('archives') }}">Tailboard Archives</a>
                             <a class="dropdown-item" href="{{ url_for('exportDataBase') }}">Export Entire Database to Excel</a>
                             <a class="dropdown-item disabled" href="#">Statistics</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuSettings" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Settings
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuSettings">
+                            <a class="dropdown-item" href="#">Email Settings</a>
                         </div>
                     </li>
                 </ul>

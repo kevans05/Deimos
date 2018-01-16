@@ -8,5 +8,6 @@ function myFunction() {
     document.getElementById("inputPhoneNumber").value = str[4];
     document.getElementById("inputActive").value = str[5];
     document.getElementById("inputCorpID").value = str[6];
+    document.getElementById("supervisorEmail").value = str[7];
 
 }

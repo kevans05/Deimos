@@ -10,7 +10,7 @@
                 <select class="form-control" id="editStaff" name="editStaff" onchange="myFunction()">
                     <option>------------------------------------</option>
                      {% for o in staff %}
-                          <option {% if o.enabled == 1 %}style='text-color: #1c3bcc'{% else %} style='text-color: #cc1e18' {% endif %} value={{ o.id }};{{ o.firstName }};{{ o.lastName }};{{ o.email }};{{ o.tel }};{{ o.enabled }};{{ o.corporateID }}>{{ o.firstName }} {{ o.lastName }} - {{ o.email }}</option>
+                          <option {% if o.enabled == 1 %}style='text-color: #1c3bcc'{% else %} style='text-color: #cc1e18' {% endif %} value={{ o.id }};{{ o.firstName }};{{ o.lastName }};{{ o.email }};{{ o.tel }};{{ o.enabled }};{{ o.corporateID }};{{ o.supervisorEmail }}>{{ o.firstName }} {{ o.lastName }} - {{ o.email }}</option>
                     {% endfor %}
                 </select>
                 <br>
@@ -39,6 +39,10 @@
                     <div class="form-group">
                         <label for="inputPhoneNumber">Phone Number:</label>
                         <input type="tel" class="form-control" id="inputPhoneNumber" name="inputPhoneNumber" aria-describedby="phoneNumber" placeholder="5196615800" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="supervisorEmail">Supervisor Email</label>
+                        <input type="email" class="form-control" id="supervisorEmail" name="supervisorEmail" aria-describedby="supervisorEmail" placeholder="roer@londonhydro.com" required>
                     </div>
                     <div class="form-group">
                         <label for="inputEnabled">Active User</label>

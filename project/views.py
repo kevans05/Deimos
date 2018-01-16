@@ -1,18 +1,18 @@
 from time import time, strftime, localtime
 from flask import render_template, request, redirect, flash, send_from_directory
 from project import app
-from .email import new_tailboard_email
-from .token import confirm_token
+
 import dataset
 import xlsxwriter
 import os
+
+from .email import newTailboardEmail, managersEmailInitiate
 
 @app.route('/')
 @app.route('/index')
 def index():
     return render_template('index.html',
                            title='Home')
-
 
 @app.route('/newTailboard')
 def newTailboard():
@@ -34,7 +34,7 @@ def handleNewTailboard():
             x = ';'.join(values)
             tailboardDict.update({key: x})
         table.insert(tailboardDict)
-        new_tailboard_email(jobID)
+        newTailboardEmail(jobID)
     return redirect('/')
 
 
@@ -70,7 +70,7 @@ def handleNewStaff():
         table = db['staff']
         table.insert(dict(firstName=request.form['inputFirstName'], lastName=request.form['inputLastName'],
                           corporateID=request.form['inputCorpID'], email=request.form['inputEmail'],
-                          tel=request.form['inputPhoneNumber'], enabled=True))
+                          tel=request.form['inputPhoneNumber'], supervisorEmail=request.form['supervisorEmail'], enabled=True))
     return redirect('/')
 
 
@@ -108,8 +108,7 @@ def handleEditStaff():
         table = db['staff']
         data = dict(id=request.form['inputid'], firstName=request.form['inputFirstName'], lastName=request.form['inputLastName'],
                           corporateID=request.form['inputCorpID'], email=request.form['inputEmail'],
-                          tel=request.form['inputPhoneNumber'], enabled=request.form['activeStaff'])
-        print(data)
+                          tel=request.form['inputPhoneNumber'], supervisorEmail=request.form['supervisorEmail'], enabled=request.form['activeStaff'])
         table.update(data, ['id'])
     return redirect('/')
 
@@ -169,6 +168,20 @@ def handleEditVehicle():
         table.update(data, ['id'])
     return redirect('/')
 
+@app.route('/newPresentDangers')
+def newPresentDangers():
+    return render_template('presentDangersNew.html',
+                           title='New Present Dangers')
+
+@app.route('/editPresentDangers')
+def editPresentDangers():
+    return render_template('presentDangersEdit.html',
+                           title='New Present Dangers')
+
+@app.route('/removePresentDangers')
+def removePresentDangers():
+    return render_template('presentDanersRemove.html',
+                           title='New Present Dangers')
 
 @app.route('/archives')
 def archives():
@@ -332,3 +345,7 @@ def per_request_callbacks(response):
         for f in filelist:
             os.remove(os.path.join(mydir, f))
     return response
+
+@app.before_first_request
+def activate_job():
+    managersEmailInitiate()

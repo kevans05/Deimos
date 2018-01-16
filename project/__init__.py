@@ -3,7 +3,7 @@
 #################
 from flask import Flask
 from flask_mail import Mail
-
+from celery import Celery
 import os
 from config import MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USE_SSL,\
     MAIL_USERNAME, MAIL_PASSWORD, ADMINS
@@ -15,6 +15,7 @@ from config import MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USE_SSL,\
 
 app = Flask(__name__)
 app.config.from_object('config')
+
 
 mail = Mail(app)
 if not app.debug:
