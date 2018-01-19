@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="jumbotron">
+      <h1 class="display-3">Reminder Settings</h1>
+        <p class="lead">Enter information needed for Reminder Settings email settings</p>
+        <hr class="my-4">
+            <form action="#" method="post">
+                <div class="form-group">
+                    <label for="mailServer">Please enter the Mail Server:</label>
+                    <input type="text" class="form-control" id="mailServer" name="mailServer" aria-describedby="mailServer" placeholder="smtp.googlemail.com" required>
+                 </div>
+                <div class="form-group">
+                    <label for="mailPort">Please enter the Mail Port:</label>
+                    <input type="text" class="form-control" id="mailPort" name="mailPort" aria-describedby="mailPort" placeholder="465" required>
+                 </div>
+                <div class="form-group">
+                    <label for="mailUseTLS">Please Select if Transport Layer Security is enabled:</label>
+                    <select class="form-control" id="mailUseTLS" name="mailUseTLS">
+                        <option value=True >True</option>
+                        <option value=False>False</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mailUseSSL">Please Select if Secure Sockets Layer is enabled:</label>
+                    <select class="form-control" id="mailUseSSL" name="mailUseSSL">
+                        <option value=True >True</option>
+                        <option value=False>False</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="username">Please enter the Username:</label>
+                    <input type="email" class="form-control" id="username" name="username" aria-describedby="username" placeholder="evans.j.k05@gmail.com" required>
+                 </div>
+                <div class="form-group">
+                    <label for="password">Please enter the Password:</label>
+                    <input type="password" class="form-control" id="password" name="password" aria-describedby="password" required>
+                 </div>
+                <br>
+                <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+            </form>
+    </div>
+</div>
+{% endblock %}

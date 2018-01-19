@@ -7,6 +7,7 @@ import xlsxwriter
 import os
 
 from .email import newTailboardEmail, managersEmailInitiate
+from .token import confirm_token
 
 @app.route('/')
 @app.route('/index')
@@ -47,7 +48,6 @@ def handleTailboardEmail(token):
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
     tailboardData = db['tailboard']
     tailboard = tailboardData.find_one(jobID=tokenInfo[1])
-    print(tailboard['presentStaffConfirmed'])
     if tailboard['presentStaffConfirmed'] is None:
         presentStaffConfirmed = str(tokenInfo[0]) + ";"
     else:
@@ -168,20 +168,108 @@ def handleEditVehicle():
         table.update(data, ['id'])
     return redirect('/')
 
+
 @app.route('/newPresentDangers')
 def newPresentDangers():
     return render_template('presentDangersNew.html',
                            title='New Present Dangers')
 
-@app.route('/editPresentDangers')
-def editPresentDangers():
-    return render_template('presentDangersEdit.html',
-                           title='New Present Dangers')
+
+@app.route('/handlNewPresentDangers', methods=['POST'])
+def handlNewPresentDangers():
+    if request.method == 'POST':
+        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+        table = db['presentDangers']
+        table.insert(dict(danger=request.form['newPresentDanger'], enabled=True))
+    return redirect('/')
 
 @app.route('/removePresentDangers')
 def removePresentDangers():
-    return render_template('presentDanersRemove.html',
+    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+    table = db['presentDangers']
+    presentDangers = table.find(enabled=True)
+    return render_template('presentDangersRemove.html',
+                           title='Remove Present Dangers',presentDangers=presentDangers)
+
+
+@app.route('/handleRemovePresentDangers', methods=['POST'])
+def handleRemovePresentDangers():
+    if request.method == 'POST':
+        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+        table = db['presentDangers']
+        for x in request.form.getlist('removePresentDangers'):
+            table.update(dict(id=x, enabled=False), ['id'])
+    return redirect('/')
+
+
+@app.route('/editPresentDangers')
+def editPresentDangers():
+    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+    table = db['presentDangers']
+    return render_template('presentDangersEdit.html',
+                           title='Edit Present Dangers',presentDangers=table)
+
+@app.route('/handlePresentDangers', methods=['POST'])
+def handlePresentDangers():
+    if request.method == 'POST':
+        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+        table = db['presentDangers']
+        data = dict(id=request.form['inputid'], danger=request.form['presentDanger'], enabled=request.form['activePresentDanger'])
+        table.update(data, ['id'])
+    return redirect('/')
+
+@app.route('/newControlsBarriers')
+def newControlsBarriers():
+    return render_template('controlsBarriersNew.html',
                            title='New Present Dangers')
+
+
+@app.route('/editControlsBarriers')
+def editControlsBarriers():
+    return render_template('controlsBarriersEdit.html',
+                           title='Edit Present Dangers')
+
+
+@app.route('/removeControlsBarriers')
+def removeControlsBarriers():
+    return render_template('controlsBarriersRemove.html',
+                           title='Remove Present Dangers')
+
+
+@app.route('/newVoltage')
+def newVoltage():
+    return render_template('voltagesNew.html',
+                           title='New Voltage')
+
+
+@app.route('/editVoltage')
+def editVoltage():
+    return render_template('voltagesEdit.html',
+                           title='Edit Voltage')
+
+
+@app.route('/removeVoltage')
+def removeVoltage():
+    return render_template('voltagesEdit.html',
+                           title='Remove Voltage')
+
+@app.route('/emailSettings')
+def emailSettings():
+    return render_template('emailSettings.html',
+                           title='Edit Settings')
+
+
+@app.route('/adminSettings')
+def adminSettings():
+    return render_template('adminSettings.html',
+                           title='Admin Settings')
+
+
+@app.route('/reminderSettings')
+def reminderSettings():
+    return render_template('reminderSettings.html',
+                           title='Admin Settings')
+
 
 @app.route('/archives')
 def archives():
@@ -266,6 +354,7 @@ def about():
     return render_template('about.html',
                            title='about', page='about')
 
+
 @app.route('/exportDataBase.xlsx')
 def exportDataBase():
     filename = str(int(time())) + 'databaseExport.xlsx'
@@ -335,6 +424,7 @@ def exportDataBase():
     workbook.close()
     return send_from_directory(fileLocation, filename)
 
+
 @app.after_request
 def per_request_callbacks(response):
     mydir = 'project/dynamic/xlsx/'
@@ -345,6 +435,7 @@ def per_request_callbacks(response):
         for f in filelist:
             os.remove(os.path.join(mydir, f))
     return response
+
 
 @app.before_first_request
 def activate_job():

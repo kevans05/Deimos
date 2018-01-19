@@ -6,7 +6,7 @@
         <p class="lead">Select a department member to be removed from the on-line tailboard</p>
         <hr class="my-4">
             <form action="{{ url_for('handleRemoveStaff') }}" method="post">
-                <select multiple class="form-control" name="removeStaff">
+                <select multiple class="form-control" name="removeStaff" id="removeStaff">
                      {% for o in staff %}
                           <option value={{ o.id }}>{{ o.firstName }} {{ o.lastName }} - {{ o.email }} </option>
                     {% endfor %}
@@ -16,4 +16,13 @@
             </form>
     </div>
 </div>
+    <script>
+    var select_element = document.getElementById( 'removeStaff' );
+        multi( select_element, {
+            'enable_search': false,
+            'search_placeholder': 'Search...',
+            'non_selected_header': null,
+            'selected_header': null
+        });
+    </script>
 {% endblock %}

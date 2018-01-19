@@ -13,13 +13,14 @@
         </script>
     {%  endif %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/static/css/multi.min.css">
+    <link rel="icon" type="image/svg" href="/static/svg/rocket.svg">
+    <script src="/static/js/multi.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/svg" href="/static/svg/rocket.svg">
 </head>
 <body>
 <div class="container-fluid">
@@ -60,9 +61,9 @@
                             Voltages
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuVoltages">
-                            <a class="dropdown-item" href="#">New Voltage</a>
-                            <a class="dropdown-item" href="#">Remove Voltage</a>
-                            <a class="dropdown-item" href="#">Edit Voltages</a>
+                            <a class="dropdown-item" href="{{ url_for('newVoltage') }}">New Voltage</a>
+                            <a class="dropdown-item" href="{{ url_for('removeVoltage') }}">Remove Voltage</a>
+                            <a class="dropdown-item" href="{{ url_for('editVoltage') }}">Edit Voltages</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -81,9 +82,9 @@
                             Controls/Barriers
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuControlsBarriers">
-                            <a class="dropdown-item" href="#">New Controls/Barriers</a>
-                            <a class="dropdown-item" href="#">Remove Controls/Barriers</a>
-                            <a class="dropdown-item" href="#">Edit Controls/Barriers</a>
+                            <a class="dropdown-item" href="{{ url_for('newControlsBarriers') }}">New Controls/Barriers</a>
+                            <a class="dropdown-item" href="{{ url_for('removeControlsBarriers') }}">Remove Controls/Barriers</a>
+                            <a class="dropdown-item" href="{{ url_for('editControlsBarriers') }}">Edit Controls/Barriers</a>
                         </div>
                     </li>
 
@@ -102,7 +103,9 @@
                             Settings
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuSettings">
-                            <a class="dropdown-item" href="#">Email Settings</a>
+                            <a class="dropdown-item" href="{{ 'emailSettings' }}">Email Settings</a>
+                            <a class="dropdown-item" href="{{ 'adminSettings' }}">Admin Settings</a>
+                            <a class="dropdown-item" href="{{ 'reminderSettings' }}">Reminder Settings</a>
                         </div>
                     </li>
                 </ul>
@@ -118,4 +121,5 @@
 {% block content %}{% endblock %}
 
 </body>
+
 </html>
