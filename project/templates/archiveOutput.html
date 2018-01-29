@@ -4,9 +4,7 @@
     {% else %}
         <title>Deimos</title>
 {% endif %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.3.0/paper.css">
-<!-- Load paper.css for happy printing -->
-<link rel="stylesheet" href="dist/paper.css">
+<link rel="stylesheet" href="static/css/paper.css">
 
 <!-- Set page size here: A5, A4 or A3 -->
 <!-- Set also "landscape" if you need -->
@@ -43,15 +41,12 @@
             <td class="tg-031e">{{ o.firstName }} {{ o.lastName }}</td>
             <td class="tg-031e">{{ o.email }}</td>
             <td class="tg-031e">{{ o.corporateID }}</td>
-            <td class="tg-031e" style="width: 5%">{% if o.present -%}&#10003; {% else %} &#10007; {%  endif %}</td>
+            <td class="tg-031e" style="width: 5%">{% if o.present -%}&#10003; {%  endif %}</td>
         </tr>
         {% endfor %}
     </table>
     <br>
-{% if cuttingValueA  > 10 and cuttingValue <= 15 %}
-</section>
-<section class="sheet padding-10mm">
-{% endif %}
+
     <table class="tg">
         <tr>
             <th class="tg-hgcj" colspan="4">Vehicles Present<br></th>
@@ -61,102 +56,50 @@
             <td class="tg-031e" style="width: 40%">{{ o.corporationID }}</td>
             <td class="tg-031e" style="width: 30%">{{ o.make }} {{ o.model }}</td>
             <td class="tg-031e" style="width: 25%"><strong>AED Present:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if o.AED -%}&#10003; {% else %} &#10007; {%  endif %}</td>
+            <td class="tg-031e" style="width: 5%">{% if o.AED -%}&#10003; {%  endif %}</td>
         </tr>
         {% endfor %}
     </table>
     <br>
-{% if cuttingValueA  > 10 and cuttingValueA <= 15 %}
-</section>
-<section class="sheet padding-10mm">
-{% endif %}
     <table class="tg">
         <tr>
             <th class="tg-hgcj" colspan="6">Voltage Present<br></th>
         </tr>
         <tr>
             <td class="tg-031e" style="width: 28.33%"><strong>Grounded:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.ground %}&#10003; {% else %} &#10007; {%  endif %}</td>
+            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.ground %}&#10003; {%  endif %}</td>
 
             <td class="tg-031e" style="width: 28.33%"><strong>Less Then or Equal To 750V:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.lessThen %}&#10003; {% else %} &#10007; {%  endif %}</td>
+            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.lessThan %}&#10003; {%  endif %}</td>
 
             <td class="tg-031e" style="width: 28.33%"><strong>Greater Then 750V:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.greaterThen %}&#10003; {% else %} &#10007; {%  endif %}</td>
+            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.greaterThen %}&#10003; {%  endif %}</td>
         </tr>
     </table>
     <br>
-{% if cuttingValueA  > 5 and cuttingValueA <= 10 %}
-</section>
-<section class="sheet padding-10mm">
-{% endif %}
+
     <table class="tg">
         <tr>
-            <th class="tg-hgcj" colspan="10">Present Dangers Present<br></th>
+            <th class="tg-hgcj" >Present Dangers Present<br></th>
         </tr>
+       {% for o in presentDangerDic %}
         <tr>
-            <td class="tg-031e" style="width: 11.6%"><strong>Cold Meter:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.coldMeter %}&#10003; {% else %} &#10007; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 11.6%"><strong>Hot Meter:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.hotMeter %}&#10003; {% else %} &#10007; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 11.6%"><strong>TX Rated:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.txRated %}&#10003; {% else %} &#10007; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 11.6%"><strong>Testing:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.testing %}&#10003; {% else %} &#10007; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 11.6%"><strong>Site Visit:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.siteVisits %}&#10003; {% else %} &#10007; {%  endif %}</td>
+            <td class="tg-031e">{{ o.danger }}</td>
         </tr>
-        <tr>
-            <td class="tg-031e" style="width: 11.6%"><strong>Non Typical:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.nonTypical %}&#10003; {% else %} &#10007; {%  endif %}</td>
+        {% endfor %}
 
-            <td class="tg-031e" style="width: 11.6%"><strong> Heights:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.heights %}&#10003; {% else %} &#10007; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 11.6%"><strong>Weather Stress:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.weatherStresses %}&#10003; {% else %} &#10007; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 11.6%"><strong>Climbing Hazards:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.climbingHazards %}&#10003; {% else %} &#10007; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 11.6%"><strong>Confined Space:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentDangerDic.confinedSpace %}&#10003; {% else %} &#10007; {%  endif %}</td>
-        </tr>
     </table>
 <br>
-{% if cuttingValueA  <= 5 %}
-</section>
-<section class="sheet padding-10mm">
-{% endif %}
+
     <table class="tg">
         <tr>
-            <th class="tg-hgcj" colspan="10">Controls/Barriers Present<br></th>
+            <th class="tg-hgcj">Controls/Barriers Present<br></th>
         </tr>
+        {% for o in controlsBarriersDic %}
         <tr>
-            <td class="tg-031e" style="width: 11.6%"><strong>Rubber Gloves:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if controlsBarriersDic.rubberGloves %}&#10003; {% else %} &#10007; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 11.6%"><strong>Fall Protection:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if controlsBarriersDic.fallProtection %}&#10003; {% else %} &#10007; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 11.6%"><strong>Rescue Plan:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if controlsBarriersDic.rescuePlan %}&#10003; {% else %} &#10007; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 11.6%"><strong>Personal Protective Equipment:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if controlsBarriersDic.PPE %}&#10003; {% else %} &#10007; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 11.6%"><strong>Equipment Inspection:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if controlsBarriersDic.equipmentInspection %}&#10003; {% else %} &#10007; {%  endif %}</td>
-
+            <td class="tg-031e">{{ o.controlsBarriers }}</td>
         </tr>
-        <tr>
-            <td class="tg-031e" style="width: 11.6%"><strong>Traffic Plan:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if controlsBarriersDic.trafficPlan %}&#10003; {% else %} &#10007; {%  endif %}</td>
-        </tr>
+        {% endfor %}
     </table>
     <h3>Job Steps:</h3>
     <p>

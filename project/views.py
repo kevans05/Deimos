@@ -1,13 +1,19 @@
-from time import time, strftime, localtime
-from flask import render_template, request, redirect, flash, send_from_directory
-from project import app
-
+import json
+import os
 import dataset
 import xlsxwriter
-import os
+import atexit
+from time import time, strftime, localtime
+from datetime import datetime
+from flask import render_template, request, redirect, flash, send_from_directory
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 
-from .email import newTailboardEmail, managersEmailInitiate
+from project import app
+from .basicModules import parse_a_database_return_a_list, parse_a_database_return_a_list_users
+from .email import newTailboardEmail, managers_email_initiate
 from .token import confirm_token
+
 
 @app.route('/')
 @app.route('/index')
@@ -15,11 +21,13 @@ def index():
     return render_template('index.html',
                            title='Home')
 
+
 @app.route('/newTailboard')
 def newTailboard():
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+
     return render_template('newTailboard.html', staff=db['staff'].find(enabled=1),
-                           vehicle=db['vehicle'].find(enabled=1))
+                           vehicle=db['vehicle'].find(enabled=1),presentDangers=db['presentDangers'].find(enabled=1),controlsBarriers=db['controlsBarriers'].find(enabled=1))
 
 
 @app.route('/handleNewTailboard', methods=['POST'])
@@ -70,7 +78,8 @@ def handleNewStaff():
         table = db['staff']
         table.insert(dict(firstName=request.form['inputFirstName'], lastName=request.form['inputLastName'],
                           corporateID=request.form['inputCorpID'], email=request.form['inputEmail'],
-                          tel=request.form['inputPhoneNumber'], supervisorEmail=request.form['supervisorEmail'], enabled=True))
+                          tel=request.form['inputPhoneNumber'], supervisorEmail=request.form['supervisorEmail'],
+                          enabled=True))
     return redirect('/')
 
 
@@ -106,9 +115,11 @@ def handleEditStaff():
     if request.method == 'POST':
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['staff']
-        data = dict(id=request.form['inputid'], firstName=request.form['inputFirstName'], lastName=request.form['inputLastName'],
-                          corporateID=request.form['inputCorpID'], email=request.form['inputEmail'],
-                          tel=request.form['inputPhoneNumber'], supervisorEmail=request.form['supervisorEmail'], enabled=request.form['activeStaff'])
+        data = dict(id=request.form['inputid'], firstName=request.form['inputFirstName'],
+                    lastName=request.form['inputLastName'],
+                    corporateID=request.form['inputCorpID'], email=request.form['inputEmail'],
+                    tel=request.form['inputPhoneNumber'], supervisorEmail=request.form['supervisorEmail'],
+                    enabled=request.form['activeStaff'])
         table.update(data, ['id'])
     return redirect('/')
 
@@ -149,23 +160,22 @@ def handleRemoveVehicle():
     return redirect('/')
 
 
-@app.route('/editVehicle')
-def editVehicle():
+@app.route('/reinstateVehicle')
+def reinstateVehicle():
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
     table = db['vehicle']
-    return render_template('vehicleEdit.html',
-                           title='New Vehicle', vehicle=table)
+    vehicle = table.find(enabled=False)
+    return render_template('vehicleReinstate.html',
+                           title='New Vehicle', vehicle=vehicle)
 
 
-@app.route('/handleEditVehicle', methods=['POST'])
-def handleEditVehicle():
+@app.route('/handleReinstateVehicle', methods=['POST'])
+def handleReinstateVehicle():
     if request.method == 'POST':
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['vehicle']
-        data = dict(id=request.form['inputid'], nickname=request.form['inputNickname'],
-                    corporationID=request.form['inputCorporationID'], make=request.form['inputMake'],
-                    model=request.form['inputModel'], enabled=request.form['inputActive'])
-        table.update(data, ['id'])
+        for x in request.form.getlist('reinstateVehicle'):
+            table.update(dict(id=x, enabled=True), ['id'])
     return redirect('/')
 
 
@@ -183,13 +193,14 @@ def handlNewPresentDangers():
         table.insert(dict(danger=request.form['newPresentDanger'], enabled=True))
     return redirect('/')
 
+
 @app.route('/removePresentDangers')
 def removePresentDangers():
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
     table = db['presentDangers']
     presentDangers = table.find(enabled=True)
     return render_template('presentDangersRemove.html',
-                           title='Remove Present Dangers',presentDangers=presentDangers)
+                           title='Present Danger', presentDangers=presentDangers)
 
 
 @app.route('/handleRemovePresentDangers', methods=['POST'])
@@ -197,26 +208,29 @@ def handleRemovePresentDangers():
     if request.method == 'POST':
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['presentDangers']
-        for x in request.form.getlist('removePresentDangers'):
+        for x in request.form.getlist('removeControlsBarriers'):
             table.update(dict(id=x, enabled=False), ['id'])
     return redirect('/')
 
 
-@app.route('/editPresentDangers')
-def editPresentDangers():
+@app.route('/reinstatePresentDangers')
+def reinstatePresentDangers():
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
     table = db['presentDangers']
-    return render_template('presentDangersEdit.html',
-                           title='Edit Present Dangers',presentDangers=table)
+    presentDangers = table.find(enabled=False)
+    return render_template('presentDangersReinstate.html',
+                           title='Present Dangers', presentDangers=presentDangers)
 
-@app.route('/handlePresentDangers', methods=['POST'])
-def handlePresentDangers():
+
+@app.route('/handleReinstatePresentDanger', methods=['POST'])
+def handleReinstatePresentDanger():
     if request.method == 'POST':
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['presentDangers']
-        data = dict(id=request.form['inputid'], danger=request.form['presentDanger'], enabled=request.form['activePresentDanger'])
-        table.update(data, ['id'])
+        for x in request.form.getlist('reinstatePresentDanger'):
+            table.update(dict(id=x, enabled=True), ['id'])
     return redirect('/')
+
 
 @app.route('/newControlsBarriers')
 def newControlsBarriers():
@@ -224,39 +238,78 @@ def newControlsBarriers():
                            title='New Present Dangers')
 
 
-@app.route('/editControlsBarriers')
-def editControlsBarriers():
-    return render_template('controlsBarriersEdit.html',
-                           title='Edit Present Dangers')
+@app.route('/handlNewControlsBarriers', methods=['POST'])
+def handlNewControlsBarriers():
+    if request.method == 'POST':
+        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+        table = db['controlsBarriers']
+        table.insert(dict(controlsBarriers=request.form['newControlsBarriers'], enabled=True))
+    return redirect('/')
 
 
 @app.route('/removeControlsBarriers')
 def removeControlsBarriers():
+    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+    table = db['controlsBarriers']
+    controlsBarriers = table.find(enabled=True)
     return render_template('controlsBarriersRemove.html',
-                           title='Remove Present Dangers')
+                           title='Remove Present Dangers', controlsBarriers=controlsBarriers)
 
 
-@app.route('/newVoltage')
-def newVoltage():
-    return render_template('voltagesNew.html',
-                           title='New Voltage')
+@app.route('/handleRemoveControlsBarriers', methods=['POST'])
+def handleRemoveControlsBarriers():
+    if request.method == 'POST':
+        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+        table = db['controlsBarriers']
+        for x in request.form.getlist('removeControlsBarriers'):
+            table.update(dict(id=x, enabled=False), ['id'])
+    return redirect('/')
 
 
-@app.route('/editVoltage')
-def editVoltage():
-    return render_template('voltagesEdit.html',
-                           title='Edit Voltage')
+@app.route('/reinstateControlsBarriers')
+def reinstateControlsBarriers():
+    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+    table = db['controlsBarriers']
+    controlsBarriers = table.find(enabled=False)
+    return render_template('controlsBarriersReinstate.html',
+                           title='Present Dangers', controlsBarriers=controlsBarriers)
 
 
-@app.route('/removeVoltage')
-def removeVoltage():
-    return render_template('voltagesEdit.html',
-                           title='Remove Voltage')
+@app.route('/handleReinstateControlsBarriers', methods=['POST'])
+def handleReinstateControlsBarriers():
+    if request.method == 'POST':
+        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+        table = db['controlsBarriers']
+        for x in request.form.getlist('reinstateControlsBarriers'):
+            table.update(dict(id=x, enabled=True), ['id'])
+    return redirect('/')
+
 
 @app.route('/emailSettings')
 def emailSettings():
     return render_template('emailSettings.html',
                            title='Edit Settings')
+
+
+@app.route('/handleEmailSettings' , methods=['POST'])
+def handleEmailSettings():
+    if request.method == 'POST':
+        admin = "['" + request.form['admin_email'] + "']"
+        if request.form['mailUseTLS'] == "true":
+            mail_uses_tls = True
+        else:
+            mail_uses_tls = False
+        if request.form['mailUseSSL'] == "true":
+            mail_uses_ssl = True
+        else:
+            mail_uses_ssl = False
+
+        data = {'mailServer':request.form['mailServer'], 'mailPort':request.form['mailPort'],
+                          'mailUseTLS':mail_uses_tls, 'mailUseSSL':mail_uses_ssl,
+                          'username':request.form['username'], 'password':request.form['password'], 'admin':admin}
+        with open('project/dynamic/db/email_server_settings.txt','w') as outfile:
+            json.dump(data,outfile)
+    return redirect('/')
 
 
 @app.route('/adminSettings')
@@ -270,6 +323,13 @@ def reminderSettings():
     return render_template('reminderSettings.html',
                            title='Admin Settings')
 
+@app.route('/handleReminderSettings' , methods=['POST'])
+def handleReminderSettings():
+    if request.method == 'POST':
+        data = {'mail_server_time': request.form['mailServerTime'], 'health_and_safety_email': request.form['healthAndSafetyEmail']}
+        with open('project/dynamic/db/reminder_settings.txt', 'w') as outfile:
+            json.dump(data, outfile)
+    return redirect('/')
 
 @app.route('/archives')
 def archives():
@@ -289,7 +349,8 @@ def archives():
                 x = userData.find_one(id=fullNames)
                 fullName = (x['firstName'] + " " + x['lastName'] + ";")
                 name = name + fullName
-        tailboardDict = {"jobID":user['jobID'], "jobDate":user['jobDate'], "location":user['location'],"presentStaff":name}
+        tailboardDict = {"jobID": user['jobID'], "jobDate": user['jobDate'], "location": user['location'],
+                         "presentStaff": name}
         tailboard.append(tailboardDict)
     return render_template('archives.html',
                            title='archives', page='archives', tailboards=tailboard)
@@ -297,57 +358,21 @@ def archives():
 
 @app.route('/handleArchives/<tailboardID>')
 def handleArchives(tailboardID):
-    presentVoltageDic = {"ground": False, "lessThan": False, "greaterThen": False}
-
-    presentDangerDic = {"coldMeter": False, "hotMeter": False, "txRated": False, "testing": False, "siteVisits": False,
-                        "nonTypical": False, "heights": False, "weatherStresses": False, "climbingHazards": False,
-                        "confinedSpace": False}
-
-    controlsBarriersDic = {"rubberGloves": False, "fallProtection": False, "rescuePlan": False,
-                           "PPE": False, "equipmentInspection": False, "trafficPlan": False}
-
-    presentUserData = []
-    presentVehicleData = []
-
+    present_voltage_dictionary = {"ground": False, "lessThan": False, "greaterThen": False}
+    #pull in the database at its current state
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-
-    tailboardData = db['tailboard'].find_one(jobID=tailboardID)
-    if tailboardData['presentStaff'] is not None:
-        presentUsers = tailboardData['presentStaff'].split(";")
-    if tailboardData['presentVehicles'] is not None:
-        presentVehicles = tailboardData['presentVehicles'].split(";")
-    if tailboardData['presentStaffConfirmed'] is not None:
-        presnetUsersConfirmed = tailboardData['presentStaffConfirmed'].split(";")
-    else:
-        presnetUsersConfirmed = []
-
-    cuttingValueA = (len(presentUsers) + len(presentVehicles))
-
-    userData = db['staff']
-
-    for users in presentUsers:
-        x = userData.find_one(id=users)
-        if users in presnetUsersConfirmed:
-            x.update({'present': True})
-        presentUserData.append(x)
-
-    vehicleData = db['vehicle']
-    for vehicle in presentVehicles:
-        presentVehicleData.append(vehicleData.find_one(id=vehicle))
-    if tailboardData['presentDangers'] is not None:
-        for presentDangers in tailboardData['presentDangers'].split(';'):
-            presentDangerDic[presentDangers] = True
-    if tailboardData['presentVoltages'] is not None:
-        for presentVoltages in tailboardData['presentVoltages'].split(';'):
-            presentVoltageDic[presentVoltages] = True
-    if tailboardData['ControlsBarriers'] is not None:
-        for controlsBarriers in tailboardData['ControlsBarriers'].split(';'):
-            controlsBarriersDic[controlsBarriers] = True
-    return render_template('archiveOutput.html', tailboardData=tailboardData, presentUserData=presentUserData,
-                           presentVehiclesData=presentVehicleData, cuttingValueA=cuttingValueA,
-                           presentDangerDic=presentDangerDic, presentVoltageDic=presentVoltageDic,
-                           controlsBarriersDic=controlsBarriersDic, title=tailboardID, page=tailboardID)
-
+    #in the database find the the tailboard that matches the tailboard ID selected
+    tailboard = db['tailboard'].find_one(jobID=tailboardID)
+    if tailboard['presentVoltages'] is not None:
+        for present_voltage in tailboard['presentVoltages'].split(';'):
+            present_voltage_dictionary[present_voltage] = True
+    return render_template('archiveOutput.html', tailboardData=tailboard,
+                           presentUserData=parse_a_database_return_a_list_users(db,tailboard),
+                           presentVehiclesData=parse_a_database_return_a_list('vehicle',db,tailboard),
+                           presentDangerDic=parse_a_database_return_a_list('presentDangers', db, tailboard),
+                           presentVoltageDic=present_voltage_dictionary,
+                           controlsBarriersDic=parse_a_database_return_a_list('controlsBarriers', db, tailboard),
+                           title=tailboardID, page=tailboardID)
 
 @app.route('/about')
 def about():
@@ -364,11 +389,12 @@ def exportDataBase():
     tailboardsTable = db['tailboard']
     userData = db['staff']
     vehicleData = db['vehicle']
-
+    presentDangersData = db['presentDangers']
+    controlsBarriersData = db['controlsBarriers']
     workbook = xlsxwriter.Workbook('project/' + fileNameCreatWorkbook)
     worksheet = workbook.add_worksheet()
 
-    worksheet.write(0, 0,'Job ID')
+    worksheet.write(0, 0, 'Job ID')
     worksheet.write(0, 1, 'Date')
     worksheet.write(0, 2, 'Voltages')
     worksheet.write(0, 3, 'Present Dangers')
@@ -387,8 +413,6 @@ def exportDataBase():
         worksheet.write(row, 0, tailboards['jobID'])
         worksheet.write(row, 1, tailboards['jobDate'])
         worksheet.write(row, 2, tailboards['presentVoltages'])
-        worksheet.write(row, 3, tailboards['presentDangers'])
-        worksheet.write(row, 4, tailboards['ControlsBarriers'])
         worksheet.write(row, 5, tailboards['location'])
         worksheet.write(row, 6, tailboards['jobSteps'])
         worksheet.write(row, 7, tailboards['hazards'])
@@ -400,8 +424,7 @@ def exportDataBase():
             for users in presentUsersList:
                 x = userData.find_one(id=users)
                 usersNameText = x['firstName'] + " " + x['lastName'] + ";" + usersNameText
-        worksheet.write(row,9,usersNameText)
-
+        worksheet.write(row, 9, usersNameText)
         presentUsersNameText = ""
         if tailboards['presentStaffConfirmed'] is not None:
             presentStaffConfirmed = tailboards['presentStaffConfirmed'].split(";")
@@ -409,16 +432,28 @@ def exportDataBase():
                 if len(users) > 0:
                     x = userData.find_one(id=users)
                     presentUsersNameText = x['firstName'] + " " + x['lastName'] + ";" + presentUsersNameText
-        worksheet.write(row,10,presentUsersNameText)
-
+        worksheet.write(row, 10, presentUsersNameText)
         vehicleText = ""
-        if tailboards['presentVehicles'] is not None:
-            vehicleList = tailboards['presentVehicles'].split(";")
+        if tailboards['vehicle'] is not None:
+            vehicleList = tailboards['vehicle'].split(";")
             for vehicle in vehicleList:
                 x = vehicleData.find_one(id=vehicle)
                 vehicleText = x['corporationID'] + ";" + vehicleText
         worksheet.write(row, 11, vehicleText)
-
+        presentDangersText = ""
+        if tailboards['presentDangers'] is not None:
+            presentDangersList = tailboards['presentDangers'].split(";")
+            for presentDangers in presentDangersList:
+                x = presentDangersData.find_one(id=presentDangers)
+                presentDangersText = x['danger'] + ";" + presentDangersText
+        worksheet.write(row, 3, presentDangersText)
+        controlsBarriersText = ""
+        if tailboards['controlsBarriers'] is not None:
+            controlsBarriersList = tailboards['controlsBarriers'].split(";")
+            for controlsBarriers in controlsBarriersList:
+                x = controlsBarriersData.find_one(id=controlsBarriers)
+                controlsBarriersText = x['controlsBarriers'] + ";" + controlsBarriersText
+        worksheet.write(row, 4, controlsBarriersText)
         row += 1
 
     workbook.close()
@@ -439,4 +474,5 @@ def per_request_callbacks(response):
 
 @app.before_first_request
 def activate_job():
-    managersEmailInitiate()
+    managers_email_initiate()
+

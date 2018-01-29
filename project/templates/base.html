@@ -53,17 +53,7 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuvehicle">
                             <a class="dropdown-item" href="{{ url_for('newVehicle') }}">New Vehicle</a>
                             <a class="dropdown-item" href="{{ url_for('removeVehicle') }}">Remove Vehicle</a>
-                            <a class="dropdown-item" href="{{ url_for('editVehicle') }}">Edit Vehicle</a>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuVoltages" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Voltages
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuVoltages">
-                            <a class="dropdown-item" href="{{ url_for('newVoltage') }}">New Voltage</a>
-                            <a class="dropdown-item" href="{{ url_for('removeVoltage') }}">Remove Voltage</a>
-                            <a class="dropdown-item" href="{{ url_for('editVoltage') }}">Edit Voltages</a>
+                            <a class="dropdown-item" href="{{ url_for('reinstateVehicle') }}">Reinstate Vehicle</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -73,7 +63,7 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuPresentDangers">
                             <a class="dropdown-item" href="{{ url_for('newPresentDangers') }}">New Present Dangers</a>
                             <a class="dropdown-item" href="{{ url_for('removePresentDangers') }}">Remove Present Dangers</a>
-                            <a class="dropdown-item" href="{{ url_for('editPresentDangers') }}">Edit Present Dangers</a>
+                            <a class="dropdown-item" href="{{ url_for('reinstatePresentDangers') }}">Reinstate Present Dangers</a>
                         </div>
                     </li>
 
@@ -84,7 +74,7 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuControlsBarriers">
                             <a class="dropdown-item" href="{{ url_for('newControlsBarriers') }}">New Controls/Barriers</a>
                             <a class="dropdown-item" href="{{ url_for('removeControlsBarriers') }}">Remove Controls/Barriers</a>
-                            <a class="dropdown-item" href="{{ url_for('editControlsBarriers') }}">Edit Controls/Barriers</a>
+                            <a class="dropdown-item" href="{{ url_for('reinstateControlsBarriers') }}">Reinstate Controls/Barriers</a>
                         </div>
                     </li>
 

@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
     <script src="/static/js/tailboardJS.js"></script>
+    <script src="/static/js/rSlider.min.js"></script>
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQpKEvZO_AooRB_G6cvKNtqh58Vj5ygOc&libraries=places&callback=initAutocomplete">
     </script>
+
+    <link rel="stylesheet" href="/static/css/rSlider.min.css">
+
     <div class="container-fluid">
         <div class="jumbotron">
             <h1 class="display-3">Create A New Tailboard</h1>
@@ -19,8 +23,8 @@
                         </select>
                      </div>
                     <div class="form-group">
-                        <label for="inputFirstName">Please select the vehicles that will be included on this tailboard:</label>
-                        <select multiple class="form-control" id="presentVehicles" name="presentVehicles">
+                        <label for="vehicle">Please select the vehicles that will be included on this tailboard:</label>
+                        <select multiple class="form-control" id="vehicle" name="vehicle">
                             {% for o in vehicle %}
                                 <option value={{ o.id }}>{{ o.nickname }} - {{ o.corporationID }} - {{ o.make }} {{ o.model }} </option>
                             {% endfor %}
@@ -38,29 +42,18 @@
                     <div class="form-group">
                         <label for="presentDangers">Please select the Present Dangers on site:</label>
                         <select multiple class="form-control" id="presentDangers" name="presentDangers">
-                            <option value="coldMeter">Cold Meter</option>
-                            <option value="hotMeter">Hot Meter</option>
-                            <option value="txRated">TX rated</option>
-                            <option value="testing">Testing</option>
-                            <option value="siteVisits">Site Visits</option>
-                            <option value="nonTypical">Non Typical</option>
-                            <option value="heights">Working at Heights</option>
-                            <option value="weatherStresses">Weather Stresses</option>
-                            <option value="climbingHazards">Climbing Hazards</option>
-                            <option value="confinedSpace">Confined Space</option>
+                            {% for o in presentDangers %}
+                                <option value={{ o.id }}>{{ o.danger }}</option>
+                            {% endfor %}
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="ControlsBarriers">Please select the Controls/Barriers present:</label>
-                        <select multiple class="form-control" id="ControlsBarriers" name="ControlsBarriers">
-                            <option value="rubberGloves">Rubber Gloves</option>
-                            <option value="rubberCoverUp">Rubber Cover Up</option>
-                            <option value="fallProtection">Fall Protection</option>
-                            <option value="rescuePlan">Rescue Plan</option>
-                            <option value="PPE">Personal Protective Equipment</option>
-                            <option value="equipmentInspection">Equipment Inspection</option>
-                            <option value="trafficPlan">Traffic Plan</option>
+                        <select multiple class="form-control" id="controlsBarriers" name="controlsBarriers">
+                            {% for o in controlsBarriers %}
+                                <option value={{ o.id }}>{{ o.controlsBarriers }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="form-group">
@@ -95,35 +88,35 @@
     <script>
     var select_element = document.getElementById( 'presentStaff' );
         multi( select_element, {
-            'enable_search': false,
+            'enable_search': true,
             'search_placeholder': 'Search...',
             'non_selected_header': null,
             'selected_header': null
         });
-    var select_element = document.getElementById( 'presentVehicles' );
+    var select_element = document.getElementById( 'vehicle' );
         multi( select_element, {
-            'enable_search': false,
+            'enable_search': true,
             'search_placeholder': 'Search...',
             'non_selected_header': null,
             'selected_header': null
         });
     var select_element = document.getElementById( 'presentVoltages' );
         multi( select_element, {
-            'enable_search': false,
+            'enable_search': true,
             'search_placeholder': 'Search...',
             'non_selected_header': null,
             'selected_header': null
         });
     var select_element = document.getElementById( 'presentDangers' );
         multi( select_element, {
-            'enable_search': false,
+            'enable_search': true,
             'search_placeholder': 'Search...',
             'non_selected_header': null,
             'selected_header': null
         });
-    var select_element = document.getElementById( 'ControlsBarriers' );
+    var select_element = document.getElementById( 'controlsBarriers' );
         multi( select_element, {
-            'enable_search': false,
+            'enable_search': true,
             'search_placeholder': 'Search...',
             'non_selected_header': null,
             'selected_header': null
