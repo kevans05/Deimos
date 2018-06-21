@@ -1,7 +1,6 @@
 import os
 import json
 basedir = os.path.abspath(os.path.dirname(__file__))
-
 WTF_CSRF_ENABLED = True
 SECRET_KEY = 'you-will-never-guess'
 SECURITY_PASSWORD_SALT = 'my_precious_two'
@@ -25,6 +24,15 @@ except FileNotFoundError:
     MAIL_PASSWORD = 'my_precious_two'
     # administrator list
     ADMINS = ['evansk@londonhydro.com']
+
+
+class Config(object):
+    # ...
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'project/dynamic/db/database.db')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
 
 # email server
 #MAIL_SERVER = 'smtp.googlemail.com'

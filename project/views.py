@@ -208,7 +208,7 @@ def handleRemovePresentDangers():
     if request.method == 'POST':
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['presentDangers']
-        for x in request.form.getlist('removeControlsBarriers'):
+        for x in request.form.getlist('removePresentDangers'):
             table.update(dict(id=x, enabled=False), ['id'])
     return redirect('/')
 
