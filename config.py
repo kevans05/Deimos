@@ -4,6 +4,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 WTF_CSRF_ENABLED = True
 SECRET_KEY = 'you-will-never-guess'
 SECURITY_PASSWORD_SALT = 'my_precious_two'
+
+
+
 try:
     with open('project/dynamic/db/email_server_settings.txt') as json_file:
             data = json.load(json_file)
@@ -24,6 +27,7 @@ except FileNotFoundError:
     MAIL_PASSWORD = 'my_precious_two'
     # administrator list
     ADMINS = ['evansk@londonhydro.com']
+
 
 
 class Config(object):

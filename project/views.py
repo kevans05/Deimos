@@ -14,6 +14,18 @@ from .basicModules import parse_a_database_return_a_list, parse_a_database_retur
 from .email import newTailboardEmail, managers_email_initiate
 from .token import confirm_token
 
+path_d = ["project/dynamic/xlsx"]
+
+@app.before_first_request
+def activate_job():
+    for path in path_d:
+        try:
+            os.makedirs(path)
+            print(path)
+        except OSError:
+            print("Creation of the directory %s failed" % path)
+        else:
+            print("Successfully created the directory %s" % path)
 
 @app.route('/')
 @app.route('/index')
