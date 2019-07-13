@@ -14,7 +14,7 @@ from .basicModules import parse_a_database_return_a_list, parse_a_database_retur
 from .email import newTailboardEmail, managers_email_initiate
 from .token import confirm_token
 
-path_d = ["project/dynamic/xlsx"]
+path_d = ["project/dynamic/xlsx","project/dynamic/db"]
 
 @app.before_first_request
 def activate_job():
@@ -26,6 +26,8 @@ def activate_job():
             print("Creation of the directory %s failed" % path)
         else:
             print("Successfully created the directory %s" % path)
+    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+
 
 @app.route('/')
 @app.route('/index')

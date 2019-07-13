@@ -99,10 +99,15 @@
                         </div>
                     </li>
                 </ul>
-                <ul class="nav navbar-nav">
-                    <a {% if page == 'tutorials' %}class="nav-item nav-link active" {% else %} class="nav-item nav-link disabled" {% endif %} href="#">Tutorials</a>
-                    <a {% if page == 'about' %}class="nav-item nav-link active" {% else %} class="nav-item nav-link" {% endif %} href="{{ url_for('about') }}">About</a>
-                </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <a {% if page == 'tutorials' %}class="nav-item nav-link active" {% else %} class="nav-item nav-link disabled" {% endif %} href="#">Tutorials</a>
+                        <a {% if page == 'about' %}class="nav-item nav-link active" {% else %} class="nav-item nav-link" {% endif %} href="{{ url_for('about') }}">About</a>
+                        {% if current_user.is_anonymous %}
+                        <a href="{{ url_for('login') }}" class="nav-item nav-link">Login</a>
+                        {% else %}
+                        <a href="{{ url_for('logout') }}" class="nav-item nav-link">Logout</a>
+                       {% endif %}
+                    </ul>
             </div>
         </div>
     </nav>
