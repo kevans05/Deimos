@@ -8,8 +8,10 @@ from datetime import datetime
 from flask import render_template, request, redirect, flash, send_from_directory
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-
+from flask_login import current_user, login_user, logout_user, login_required
 from project import app
+from project.models import User
+from project.forms import LoginForm, RegistrationForm
 from .basicModules import parse_a_database_return_a_list, parse_a_database_return_a_list_users
 from .email import newTailboardEmail, managers_email_initiate
 from .token import confirm_token
@@ -37,6 +39,7 @@ def index():
 
 
 @app.route('/newTailboard')
+@login_required
 def newTailboard():
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
 
@@ -45,6 +48,7 @@ def newTailboard():
 
 
 @app.route('/handleNewTailboard', methods=['POST'])
+@login_required
 def handleNewTailboard():
     jobID = int(time())
     jobDate = strftime('%Y-%m-%d', localtime(jobID))
@@ -80,6 +84,7 @@ def handleTailboardEmail(token):
 
 
 @app.route('/newStaff')
+@login_required
 def newStaff():
     return render_template('staffNew.html',
                            title='New Staff')
@@ -98,6 +103,7 @@ def handleNewStaff():
 
 
 @app.route('/removeStaff')
+@login_required
 def removeStaff():
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
     table = db['staff']
@@ -393,6 +399,40 @@ def about():
     return render_template('about.html',
                            title='about', page='about')
 
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flash('Invalid username or password')
+            return redirect(url_for('login'))
+        login_user(user, remember=form.remember_me.data)
+        return redirect(url_for('index'))
+    return render_template('login.html', title='Sign In', form=form)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Congratulations, you are now a registered user!')
+        return redirect(url_for('login'))
+    return render_template('register.html', title='Register', form=form)
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route('/exportDataBase.xlsx')
 def exportDataBase():
