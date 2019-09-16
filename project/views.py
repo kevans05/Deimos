@@ -29,6 +29,7 @@ def activate_job():
         else:
             print("Successfully created the directory %s" % path)
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
+    managers_email_initiate()
 
 
 @app.route('/')
@@ -529,7 +530,5 @@ def per_request_callbacks(response):
     return response
 
 
-@app.before_first_request
-def activate_job():
-    managers_email_initiate()
+
 
