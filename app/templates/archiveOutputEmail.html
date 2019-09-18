@@ -1,0 +1,97 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+{% if title %}
+    <title>{{ title }} - Deimos</title>
+{% else %}
+    <title>Deimos</title>
+{% endif %}
+<body>
+<!-- Write HTML just like a web page -->
+<center><h1>Tailboard Report</h1></center>
+<hr>
+<p><strong>Date: </strong><i> {{ tailboardData.jobDate }}</i></p>
+<p><strong>Job ID:</strong><i> {{ tailboardData.jobID }}</i></p>
+<p><strong>Job Location:</strong><i> {{ tailboardData.location }}</i></p>
+<hr>
+<p><strong>Staff Present</strong></p>
+
+<table>
+    {% for o in presentUserData %}
+        <tr>
+            <td style="width: 42.5%">{{ o.firstName }} {{ o.lastName }}</td>
+            <td style="width: 42.5%">{{ o.email }}</td>
+            <td style="width: 10%">{{ o.corporateID }}</td>
+            <td style="width: 5%">{% if o.present -%}&#10003; {%  endif %}</td>
+        </tr>
+    {% endfor %}
+</table>
+<hr>
+<p><strong>Vehicles Present</strong></p>
+<table>
+    {% for o in presentVehiclesData %}
+        <tr>
+            <td style="width: 25%">{{ o.corporationID }}</td>
+            <td style="width: 45%">{{ o.make }} {{ o.model }}</td>
+            <td style="width: 25%"><i>AED Present:</i></td>
+            <td style="width: 5%">{% if o.AED -%}&#10003; {% endif %}</td>
+        </tr>
+    {% endfor %}
+</table>
+<hr>
+<p><strong>Voltage Present</strong></p>
+<table>
+        <tr>
+            <td class="tg-031e" style="width: 28.33%"><strong>Grounded:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.ground %}&#10003; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 28.33%"><strong>Less Then or Equal To 750V:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.lessThan %}&#10003; {%  endif %}</td>
+
+            <td class="tg-031e" style="width: 28.33%"><strong>Greater Then 750V:</strong></td>
+            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.greaterThen %}&#10003; {%  endif %}</td>
+        </tr>
+</table>
+<hr>
+<p><strong>Present Dangers Present</strong></p>
+<table>
+   {% for o in presentDangerDic %}
+        <tr>
+            <td class="tg-031e">{{ o.danger }}</td>
+        </tr>
+    {% endfor %}
+</table>
+<hr>
+<p><strong>Controls/Barriers Present</strong></p>
+<table>
+    {% for o in controlsBarriersDic %}
+        <tr>
+            <td class="tg-031e">{{ o.controlsBarriers }}</td>
+        </tr>
+    {% endfor %}
+</table>
+<hr>
+<h3>Job Steps:</h3>
+<p>
+    {{ tailboardData.jobSteps }}
+</p>
+<hr>
+<h3>Hazards:</h3>
+<p>
+    {{ tailboardData.hazards }}
+</p>
+<hr>
+<h3>Protections:</h3>
+<p>
+    {{ tailboardData.barrriersMitigation }}
+</p>
+<hr>
+<center>
+    <h4>
+        <p><i>By clicking the following link I </i><b>({{ firstName }} {{ lastName }})</b><i> agree that the information
+            in this tailboard is correct:</i></p>
+    </h4>
+    <h3><a href="{{ token }}">Submit as Correct</a></h3>
+    <p>{{ token }}</p>
+</center>
+</body>
+</html>

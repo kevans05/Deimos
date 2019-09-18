@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="jumbotron">
+        <h1 class="display-3">Create A New Controls/Barriers</h1>
+        <p class="lead">Enter a new Controls/Barrier to be included on the on-line tailboard</p>
+        <hr class="my-4">
+            <form action="{{ url_for('handlNewControlsBarriers') }}" method="post">
+                <div class="form-group">
+                    <label for="newControlsBarriers">Please select the New Present Dangers present:</label>
+                    <input type="text" class="form-control" id="newControlsBarriers" name="newControlsBarriers" aria-describedby="newControlsBarriers" placeholder="Hard Hat"  required>
+                 </div>
+                <br>
+                <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+            </form>
+    </div>
+</div>
+{% endblock %}

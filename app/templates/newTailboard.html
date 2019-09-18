@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block content %}
+    <script src="/static/js/tailboardJS.js"></script>
+    <script src="/static/js/rSlider.min.js"></script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQpKEvZO_AooRB_G6cvKNtqh58Vj5ygOc&libraries=places&callback=initAutocomplete">
+    </script>
+
+    <link rel="stylesheet" href="/static/css/rSlider.min.css">
+
+    <div class="container-fluid">
+        <div class="jumbotron">
+            <h1 class="display-3">Create A New Tailboard</h1>
+            <p class="lead">Please enter the following information to create a new Tailboard</p>
+            <hr class="my-4">
+                <form action="{{ url_for('handleNewTailboard') }}" method="post">
+                    <div class="form-group">
+                        <label for="presentStaff">Please select the staff that will be included on this tailboard:</label>
+                        <select multiple class="form-control" id="presentStaff" name="presentStaff">
+                            {% for o in staff %}
+                                <option value={{ o.id }}>{{ o.firstName }} {{ o.lastName }} - {{ o.email }} </option>
+                            {% endfor %}
+                        </select>
+                     </div>
+                    <div class="form-group">
+                        <label for="vehicle">Please select the vehicles that will be included on this tailboard:</label>
+                        <select multiple class="form-control" id="vehicle" name="vehicle">
+                            {% for o in vehicle %}
+                                <option value={{ o.id }}>{{ o.nickname }} - {{ o.corporationID }} - {{ o.make }} {{ o.model }} </option>
+                            {% endfor %}
+                        </select>
+                     </div>
+                    <div class="form-group">
+                        <label for="voltagesPresent">Please select the Voltages that are present on the site:</label>
+                        <select multiple class="form-control" id="presentVoltages" name="presentVoltages" size="3">
+                            <option value="ground">Grounded</option>
+                            <option value="lessThan">≤ 750 V</option>
+                            <option value="greaterThen">> 750 V</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="presentDangers">Please select the Present Dangers on site:</label>
+                        <select multiple class="form-control" id="presentDangers" name="presentDangers">
+                            {% for o in presentDangers %}
+                                <option value={{ o.id }}>{{ o.danger }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ControlsBarriers">Please select the Controls/Barriers present:</label>
+                        <select multiple class="form-control" id="controlsBarriers" name="controlsBarriers">
+                            {% for o in controlsBarriers %}
+                                <option value={{ o.id }}>{{ o.controlsBarriers }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="locationField">
+                            <label for="autocomplete">Please eneter the location that this tailboard will cover:</label>
+                            <div class="input-group">
+                                <input class="form-control" id="autocomplete" name="location" onfocus="geolocate()" autocomplete="off" type="text">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-success" onclick="getLocation()"> Near Me </button>
+                                </span>
+                            </div>
+                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="jobSteps">Please describe the job steps that will be taken in text:</label>
+                        <textarea rows="5" class="form-control" id="jobSteps" name="jobSteps" aria-describedby="jobSteps" required></textarea>
+                    </div>
+                     <div class="form-group">
+                        <label for="hazards">Please describe the Hazards that will be taken in text:</label>
+                        <textarea rows="5" class="form-control" id="hazards" name="hazards" aria-describedby="hazards" required></textarea>
+                    </div>
+                     <div class="form-group">
+                        <label for="barrriersMitigation">Please describe the Protections that will be taken in text:</label>
+                        <textarea rows="5" class="form-control" id="barrriersMitigation" name="barrriersMitigation" aria-describedby="barrriersMitigation" required></textarea>
+                    </div>
+                    <hr class="my-4">
+                    <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+                </form>
+        </div>
+    </div>
+
+    <script>
+    var select_element = document.getElementById( 'presentStaff' );
+        multi( select_element, {
+            'enable_search': true,
+            'search_placeholder': 'Search...',
+            'non_selected_header': null,
+            'selected_header': null
+        });
+    var select_element = document.getElementById( 'vehicle' );
+        multi( select_element, {
+            'enable_search': true,
+            'search_placeholder': 'Search...',
+            'non_selected_header': null,
+            'selected_header': null
+        });
+    var select_element = document.getElementById( 'presentVoltages' );
+        multi( select_element, {
+            'enable_search': true,
+            'search_placeholder': 'Search...',
+            'non_selected_header': null,
+            'selected_header': null
+        });
+    var select_element = document.getElementById( 'presentDangers' );
+        multi( select_element, {
+            'enable_search': true,
+            'search_placeholder': 'Search...',
+            'non_selected_header': null,
+            'selected_header': null
+        });
+    var select_element = document.getElementById( 'controlsBarriers' );
+        multi( select_element, {
+            'enable_search': true,
+            'search_placeholder': 'Search...',
+            'non_selected_header': null,
+            'selected_header': null
+        });
+    </script>
+
+
+{% endblock %}

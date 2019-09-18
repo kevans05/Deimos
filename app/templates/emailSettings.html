@@ -1,0 +1,50 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="jumbotron">
+      <h1 class="display-3">Email Settings</h1>
+        <p class="lead">Enter information needed for the email settings</p>
+        <hr class="my-4">
+            <form action="{{ url_for('handleEmailSettings') }}" method="post">
+                <div class="form-group">
+                    <label for="mailServer">Please enter the Mail Server:</label>
+                    <input type="text" class="form-control" id="mailServer" name="mailServer" aria-describedby="mailServer" placeholder="smtp.googlemail.com" required>
+                 </div>
+                <div class="form-group">
+                    <label for="mailPort">Please enter the Mail Port:</label>
+                    <input type="text" class="form-control" id="mailPort" name="mailPort" aria-describedby="mailPort" placeholder="465" required>
+                 </div>
+                <div class="form-group">
+                    <label for="mailUseTLS">Please Select if Transport Layer Security is enabled:</label>
+                    <select class="form-control" id="mailUseTLS" name="mailUseTLS">
+                        <option value=true >True</option>
+                        <option value=false>False</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mailUseSSL">Please Select if Secure Sockets Layer is enabled:</label>
+                    <select class="form-control" id="mailUseSSL" name="mailUseSSL">
+                        <option value=true >True</option>
+                        <option value=false>False</option>
+                    </select>
+                    <input type="checkbox" class="custom-control-input" id="mailUseSSL" name="mailUseSSL">
+                </div>
+                <div class="form-group">
+                    <label for="username">Please enter the Username:</label>
+                    <input type="email" class="form-control" id="username" name="username" aria-describedby="username" placeholder="evans.j.k05@gmail.com" required>
+                 </div>
+                <div class="form-group">
+                    <label for="password">Please enter the Password:</label>
+                    <input type="password" class="form-control" id="password" name="password" aria-describedby="password">
+                 </div>
+                <div class="form-group">
+                    <label for="admin_email">Enter the email accounts accounts admin email</label>
+                    <input type="email" class="form-control" id="admin_email" name="admin_email" aria-describedby="admin_email" placeholder="the_boss@gmail.com">
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+            </form>
+    </div>
+</div>
+{% endblock %}
