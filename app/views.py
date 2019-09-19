@@ -10,7 +10,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from app import app, db
-from app.models import User, Vehicle
+from app.models import User, Vehicle, PresentDangers, ControlBarriers
 from app.forms import LoginForm, RegistrationForm
 from .basicModules import parse_a_database_return_a_list, parse_a_database_return_a_list_users
 from .email import newTailboardEmail, managers_email_initiate
@@ -170,12 +170,6 @@ def newVehicle():
 @app.route('/handleNewVehicle', methods=['POST'])
 def handleNewVehicle():
     if request.method == 'POST':
-        #db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        #table = db['vehicle']
-        #table.insert(dict(nickname=request.form['inputNickname'],
-        #                  corporationID=request.form['inputCorporationID'], make=request.form['inputMake'],
-        #                  model=request.form['inputModel'], enabled=True))
-        print(request.form) 
         vehicle = Vehicle(nickname=request.form['inputNickname'],
                 corporationID=request.form['inputCorporationID'], make=request.form['inputMake'],
                 model=request.form['inputModel'],enabled=True)
@@ -186,13 +180,12 @@ def handleNewVehicle():
     return redirect('/')
 
 
-@app.route('/removeVehicle')
-def removeVehicle():
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    table = db['vehicle']
-    vehicle = table.find(enabled=True)
-    return render_template('vehicleRemove.html',
-                           title='New Vehicle', vehicle=vehicle)
+@app.route('/editVehicle', methods=['GET','POST'])
+def editVehicle():
+    
+    vehicle = Vehicle.query.all() 
+    return render_template('vehicleEdit.html',
+                           title='Edit Vehicle', vehicle=vehicle)
 
 
 @app.route('/handleRemoveVehicle', methods=['POST'])
@@ -233,9 +226,10 @@ def newPresentDangers():
 @app.route('/handlNewPresentDangers', methods=['POST'])
 def handlNewPresentDangers():
     if request.method == 'POST':
-        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        table = db['presentDangers']
-        table.insert(dict(danger=request.form['newPresentDanger'], enabled=True))
+        presentDangers = PresentDangers(dangers=request.form['newPresentDanger'],enabled=True)
+        db.session.add(presentDangers)
+        db.session.commit()
+        return redirect('login')
     return redirect('/')
 
 
@@ -285,10 +279,12 @@ def newControlsBarriers():
 
 @app.route('/handlNewControlsBarriers', methods=['POST'])
 def handlNewControlsBarriers():
+    ControlBarriers
     if request.method == 'POST':
-        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        table = db['controlsBarriers']
-        table.insert(dict(controlsBarriers=request.form['newControlsBarriers'], enabled=True))
+        print(request.form)
+        controlBarriers = ControlBarriers(controlBarriers=request.form['newControlBarriers'],enabled=True)
+        db.session.add(controlBarriers)
+        db.session.commit()
     return redirect('/')
 
 

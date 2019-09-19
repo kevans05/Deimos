@@ -13,15 +13,15 @@ class Vehicle(db.Model):
     model = db.Column(db.String(64), index=True)
     enabled = db.Column(db.Boolean, index=True)
 
-# class presentDangers(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     dangers = db.Column(db.String(64), index=True, unique=True)
-#     enabled = db.Column(db.Boolean, index=True, unique=True)
-#
-# class controlsBarriers(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     controlsBarriers = db.Column(db.String(64), index=True, unique=True)
-#     enabled = db.Column(db.Boolean, index=True, unique=True)
+class PresentDangers(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    dangers = db.Column(db.String(64), index=True, unique=True)
+    enabled = db.Column(db.Boolean, index=True)
+
+class ControlBarriers(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    controlBarriers = db.Column(db.String(64), index=True, unique=True)
+    enabled = db.Column(db.Boolean, index=True, unique=True)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
