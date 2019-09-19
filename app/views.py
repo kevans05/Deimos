@@ -161,24 +161,17 @@ def handleEditStaff():
     return redirect('/')
 
 
-@app.route('/newVehicle')
+@app.route('/newVehicle', methods=['GET','POST'])
 def newVehicle():
-    return render_template('vehicleNew.html',
-                           title='New Vehicle')
-
-
-@app.route('/handleNewVehicle', methods=['POST'])
-def handleNewVehicle():
     if request.method == 'POST':
         vehicle = Vehicle(nickname=request.form['inputNickname'],
                 corporationID=request.form['inputCorporationID'], make=request.form['inputMake'],
                 model=request.form['inputModel'],enabled=True)
         db.session.add(vehicle)
         db.session.commit()
-        return redirect('login')
-
-    return redirect('/')
-
+        return redirect('newVehicle')
+    return render_template('vehicleNew.html',
+                           title='New Vehicle')
 
 @app.route('/editVehicle', methods=['GET','POST'])
 def editVehicle():
@@ -195,120 +188,52 @@ def editVehicle():
                            title='Edit Vehicle', vehicle=vehicle)
 
 
-@app.route('/newPresentDangers')
+@app.route('/newPresentDangers', methods=['GET','POST'])
 def newPresentDangers():
-    return render_template('presentDangersNew.html',
-                           title='New Present Dangers')
-
-
-@app.route('/handlNewPresentDangers', methods=['POST'])
-def handlNewPresentDangers():
     if request.method == 'POST':
         presentDangers = PresentDangers(dangers=request.form['newPresentDanger'],enabled=True)
         db.session.add(presentDangers)
         db.session.commit()
-        return redirect('login')
-    return redirect('/')
-
-
-@app.route('/removePresentDangers')
-def removePresentDangers():
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    table = db['presentDangers']
-    presentDangers = table.find(enabled=True)
-    return render_template('presentDangersRemove.html',
-                           title='Present Danger', presentDangers=presentDangers)
-
-
-@app.route('/handleRemovePresentDangers', methods=['POST'])
-def handleRemovePresentDangers():
-    if request.method == 'POST':
-        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        table = db['presentDangers']
-        for x in request.form.getlist('removePresentDangers'):
-            table.update(dict(id=x, enabled=False), ['id'])
-    return redirect('/')
-
-
-@app.route('/reinstatePresentDangers')
-def reinstatePresentDangers():
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    table = db['presentDangers']
-    presentDangers = table.find(enabled=False)
-    return render_template('presentDangersReinstate.html',
-                           title='Present Dangers', presentDangers=presentDangers)
-
-
-@app.route('/handleReinstatePresentDanger', methods=['POST'])
-def handleReinstatePresentDanger():
-    if request.method == 'POST':
-        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        table = db['presentDangers']
-        for x in request.form.getlist('reinstatePresentDanger'):
-            table.update(dict(id=x, enabled=True), ['id'])
-    return redirect('/')
-
-
-@app.route('/newControlsBarriers')
-def newControlsBarriers():
-    return render_template('controlsBarriersNew.html',
+        return redirect('/')
+    return render_template('presentDangersNew.html',
                            title='New Present Dangers')
 
-
-@app.route('/handlNewControlsBarriers', methods=['POST'])
-def handlNewControlsBarriers():
-    ControlBarriers
+@app.route('/editPresentDangers', methods=['GET','POST'])
+def editPresentDangers():
+    presentDangers = PresentDangers.query.all()
     if request.method == 'POST':
-        print(request.form)
+        target_presentDangers = PresentDangers.query.filter_by(id=request.form['inputid']).first()
+        target_presentDangers.dangers=request.form['inputDangers']
+        db.session.commit()
+        return redirect('/')
+    return render_template('presentDangersEdit.html',
+                           title='Present Danger', presentDangers=presentDangers)
+
+@app.route('/newControlBarriers', methods=['GET','POST'])
+def newControlBarriers():
+    if request.method == 'POST':
         controlBarriers = ControlBarriers(controlBarriers=request.form['newControlBarriers'],enabled=True)
         db.session.add(controlBarriers)
         db.session.commit()
-    return redirect('/')
+        return redirect('/')
+    return render_template('controlsBarriersNew.html',
+                           title='New Present Dangers')
 
-
-@app.route('/removeControlsBarriers')
-def removeControlsBarriers():
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    table = db['controlsBarriers']
-    controlsBarriers = table.find(enabled=True)
-    return render_template('controlsBarriersRemove.html',
-                           title='Remove Present Dangers', controlsBarriers=controlsBarriers)
-
-
-@app.route('/handleRemoveControlsBarriers', methods=['POST'])
-def handleRemoveControlsBarriers():
+@app.route('/editControlBarriers', methods=['GET','POST'])
+def editControlBarriers():
+    controlBarriers= ControlBarriers.query.all()
     if request.method == 'POST':
-        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        table = db['controlsBarriers']
-        for x in request.form.getlist('removeControlsBarriers'):
-            table.update(dict(id=x, enabled=False), ['id'])
-    return redirect('/')
-
-
-@app.route('/reinstateControlsBarriers')
-def reinstateControlsBarriers():
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    table = db['controlsBarriers']
-    controlsBarriers = table.find(enabled=False)
-    return render_template('controlsBarriersReinstate.html',
-                           title='Present Dangers', controlsBarriers=controlsBarriers)
-
-
-@app.route('/handleReinstateControlsBarriers', methods=['POST'])
-def handleReinstateControlsBarriers():
-    if request.method == 'POST':
-        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        table = db['controlsBarriers']
-        for x in request.form.getlist('reinstateControlsBarriers'):
-            table.update(dict(id=x, enabled=True), ['id'])
-    return redirect('/')
-
+        target_presentDangers = PresentDangers.query.filter_by(id=request.form['inputid']).first()
+        target_presentDangers.dangers=request.form['inputDangers']
+        db.session.commit()
+        return redirect('/')
+    return render_template('presentDangersEdit.html',
+                           title='Present Danger', presentDangers=presentDangers)
 
 @app.route('/emailSettings')
 def emailSettings():
     return render_template('emailSettings.html',
                            title='Edit Settings')
-
 
 @app.route('/handleEmailSettings' , methods=['POST'])
 def handleEmailSettings():

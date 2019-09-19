@@ -5,7 +5,7 @@
         <h1 class="display-3">Create A New Present Danger</h1>
         <p class="lead">Enter a new Danger to be included on the on-line tailboard</p>
         <hr class="my-4">
-            <form action="{{ url_for('handlNewPresentDangers') }}" method="post">
+            <form action="{{ url_for('newPresentDangers') }}" method="post">
                 <div class="form-group">
                     <label for="newControlsBarriers">Please enter the New Present Dangers present:</label>
                     <input type="text" class="form-control" id="newPresentDanger" name="newPresentDanger" aria-describedby="newPresentDanger" placeholder="Sharp Objects"  required>

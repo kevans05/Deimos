@@ -45,7 +45,6 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuStaff">
                             <a class="dropdown-item" href="{{ url_for('newStaff') }}">New Staff</a>
-                            <a class="dropdown-item" href="{{ url_for('removeStaff') }}">Remove Staff</a>
                             <a class="dropdown-item" href="{{ url_for('editStaff') }}">Edit Staff</a>
                         </div>
                     </li>
@@ -64,8 +63,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuPresentDangers">
                             <a class="dropdown-item" href="{{ url_for('newPresentDangers') }}">New Present Dangers</a>
-                            <a class="dropdown-item" href="{{ url_for('removePresentDangers') }}">Remove Present Dangers</a>
-                            <a class="dropdown-item" href="{{ url_for('reinstatePresentDangers') }}">Reinstate Present Dangers</a>
+                            <a class="dropdown-item" href="{{ url_for('editPresentDangers') }}">Edit Present Dangers</a>
                         </div>
                     </li>
 
@@ -74,9 +72,8 @@
                             Controls/Barriers
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuControlsBarriers">
-                            <a class="dropdown-item" href="{{ url_for('newControlsBarriers') }}">New Controls/Barriers</a>
-                            <a class="dropdown-item" href="{{ url_for('removeControlsBarriers') }}">Remove Controls/Barriers</a>
-                            <a class="dropdown-item" href="{{ url_for('reinstateControlsBarriers') }}">Reinstate Controls/Barriers</a>
+                            <a class="dropdown-item" href="{{ url_for('newControlBarriers') }}">New Controls/Barriers</a>
+                            <a class="dropdown-item" href="{{ url_for('editControlBarriers') }}">Edit Controls/Barriers</a>
                         </div>
                     </li>
 
