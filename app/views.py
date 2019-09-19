@@ -182,39 +182,17 @@ def handleNewVehicle():
 
 @app.route('/editVehicle', methods=['GET','POST'])
 def editVehicle():
-    
-    vehicle = Vehicle.query.all() 
+    vehicle = Vehicle.query.all()
+    if request.method == 'POST':
+        target_vehicle = Vehicle.query.filter_by(id=request.form['inputid']).first()
+        target_vehicle.nickname=request.form['inputNickname']
+        target_vehicle.corporationID=request.form['inputCorporationID']
+        target_vehicle.make=request.form['inputMake']
+        target_vehicle.model=request.form['inputModel']
+        db.session.commit()
+        return redirect('/')
     return render_template('vehicleEdit.html',
                            title='Edit Vehicle', vehicle=vehicle)
-
-
-@app.route('/handleRemoveVehicle', methods=['POST'])
-def handleRemoveVehicle():
-    if request.method == 'POST':
-        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        table = db['vehicle']
-        for x in request.form.getlist('removeVehicle'):
-            table.update(dict(id=x, enabled=False), ['id'])
-    return redirect('/')
-
-
-@app.route('/reinstateVehicle')
-def reinstateVehicle():
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    table = db['vehicle']
-    vehicle = table.find(enabled=False)
-    return render_template('vehicleReinstate.html',
-                           title='New Vehicle', vehicle=vehicle)
-
-
-@app.route('/handleReinstateVehicle', methods=['POST'])
-def handleReinstateVehicle():
-    if request.method == 'POST':
-        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        table = db['vehicle']
-        for x in request.form.getlist('reinstateVehicle'):
-            table.update(dict(id=x, enabled=True), ['id'])
-    return redirect('/')
 
 
 @app.route('/newPresentDangers')
