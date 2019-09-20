@@ -224,11 +224,11 @@ def editControlBarriers():
     controlBarriers= ControlBarriers.query.all()
     if request.method == 'POST':
         target_presentDangers = PresentDangers.query.filter_by(id=request.form['inputid']).first()
-        target_presentDangers.dangers=request.form['inputDangers']
+        target_presentDangers.dangers=request.form['selectControlOrBarriers']
         db.session.commit()
         return redirect('/')
-    return render_template('presentDangersEdit.html',
-                           title='Present Danger', presentDangers=presentDangers)
+    return render_template('controlsBarriersEdit.html',
+                           title='Present Danger',controlBarriers=controlBarriers)
 
 @app.route('/emailSettings')
 def emailSettings():
