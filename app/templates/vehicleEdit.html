@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+    <script type="application/javascript">
+    </script>
+
+<div class="container-fluid">
+    <div class="jumbotron">
+        <h1 class="display-3">Edit A vehicle</h1>
+        <p class="lead">Select a vehicle to edit</p>
+        <hr class="my-4">
+	<select class="form-control" id="selectVehicle"  name="selectVehicle" id="selectVehicle"onchange="myFunction()" >
+		<option>----------------------------------</option>
+		{% for o in vehicle %}
+		    <option value="{{ o.id }};{{ o.nickname }};{{ o.corporationID }};{{ o.make }};{{ o.model }}">{{ o.nickname }} - {{ o.corporationID }} - {{ o.make }} - {{ o.model }} </option>
+		{% endfor %}
+	</select>
+	<br>
+        <form action="{{ url_for('editVehicle') }}" method="post">
+	    <div class="form-group">
+		<label for="id">ID:</label>
+		<input type="text" class="form-control" id="id" name="id" aria-describedby="id" placeholder="0" disabled>
+		<input type="text" class="form-control" id="inputid" name="inputid" aria-describedby="id" placeholder="0" hidden>
+	    </div>
+	    <div class="form-group">
+	        <label for="inputNickname">Nickname:</label>
+	        <input type="text" class="form-control" id="inputNickname" name="inputNickname" aria-describedby="nickname" placeholder="Hyperion" required>
+	    </div>
+	    <div class="form-group">
+		<label for="inputCorporationID">Corporation ID:</label>
+		<input type="number" class="form-control" id="inputCorporationID" name="inputCorporationID" aria-describedby="CorporationID" placeholder="3.4" required>
+            </div>
+	    <div class="form-group">
+		<label for="inputMake">Make:</label>
+		<input type="text" class="form-control" id="inputMake" name="inputMake" aria-describedby="make" placeholder="Anvil Aerospace" required>               </div>
+	    <div class="form-group">
+		<label for="inputModel">Model:</label>
+		<input type="text" class="form-control" id="inputModel" name="inputModel" aria-describedby="model" placeholder="Hurricane" required>
+	    </div>
+	    <div class="form-group">
+		<label for="inputEnabled">Enabled:</label>
+		<input type="range" class="form-control-range" id="inputEnabled" name="inputEnabled" aria-describedby="Enabled" min=0 max=1 style="width: 100%" default = 0 required>
+	    <div>
+	    <br>
+            <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+	</form>
+    </div>
+</div>
+<script>
+    var select_element = document.getElementById( 'removeVehicle' );
+        multi( select_element, {
+            'enable_search': false,
+            'search_placeholder': 'Search...',
+            'non_selected_header': null,
+            'selected_header': null
+        });
+</script>
+<script type="application/javascript">
+    function myFunction() {
+	var str=document.getElementById('selectVehicle').value.split(";");
+	document.getElementById("id").value = str[0];
+	document.getElementById("inputid").value = str[0];
+	document.getElementById("inputNickname").value = str[1];
+	document.getElementById("inputCorporationID").value = parseInt(str[2]);
+	document.getElementById("inputMake").value = str[3];
+	document.getElementById("inputModel").value = str[4];
+	
+	}
+    </script>
+{% endblock %}

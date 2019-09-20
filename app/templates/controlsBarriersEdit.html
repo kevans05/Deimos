@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+    <script type="application/javascript">
+    </script>
+
+<div class="container-fluid">
+    <div class="jumbotron">
+        <h1 class="display-3">Edit A Control or Barrier</h1>
+        <p class="lead">Select a control or barrier</p>
+        <hr class="my-4">
+	<select class="form-control" id="selectControlOrBarriers"  name="selectControlOrBarriers" id="selectVehicle"onchange="myFunction()" >
+		<option>----------------------------------</option>
+		{% for o in controlBarriers %}
+		    <option value="{{ o.id }};{{ o.controlBarriers }}">{{ o.controlBarriers }} </option>
+		{% endfor %}
+	</select>
+	<br>
+        <form action="{{ url_for('editControlBarriers') }}" method="post">
+	    <div class="form-group">
+		<label for="id">ID:</label>
+		<input type="text" class="form-control" id="id" name="id" aria-describedby="id" placeholder="0" disabled>
+		<input type="text" class="form-control" id="inputid" name="inputid" aria-describedby="id" placeholder="0" hidden>
+	    </div>
+	    <div class="form-group">
+	        <label for="inputDangers">Control or Barrier:</label>
+	        <input type="text" class="form-control" id="selectControlOrBarriers" name="selectControlOrBarriers" aria-describedby="selectControlOrBarriers" placeholder="vacume" required>
+	    </div>
+	    <div class="form-group">
+		<label for="inputEnabled">Enabled:</label>
+		<input type="checkbox" class="custom-control-inut" id="inputEnabled" name="inputEnabled" aria-describedby="Enabled" required>
+	    <div>
+	    <br>
+            <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+	</form>
+    </div>
+</div>
+<script>
+    var select_element = document.getElementById( 'removeVehicle' );
+        multi( select_element, {
+            'enable_search': false,
+            'search_placeholder': 'Search...',
+            'non_selected_header': null,
+            'selected_header': null
+        });
+</script>
+<script type="application/javascript">
+    function myFunction() {
+	var str=document.getElementById('selectControlOrBarriers').value.split(";");
+	document.getElementById("id").value = str[0];
+	document.getElementById("inputid").value = str[0];
+	document.getElementById("selectControlOrBarriers").value = str[1];	
+	}
+    </script>
+{% endblock %}
