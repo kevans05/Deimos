@@ -22,8 +22,8 @@
 		<input type="text" class="form-control" id="inputid" name="inputid" aria-describedby="id" placeholder="0" hidden>
 	    </div>
 	    <div class="form-group">
-	        <label for="inputDangers">Control or Barrier:</label>
-	        <input type="text" class="form-control" id="selectControlOrBarriers" name="selectControlOrBarriers" aria-describedby="selectControlOrBarriers" placeholder="vacume" required>
+	        <label for="controlOrBarriers">Control or Barrier:</label>
+	        <input type="text" class="form-control" id="controlOrBarriers" name="controlOrBarriers" aria-describedby="selectControlOrBarriers" placeholder="vacume" required>
 	    </div>
 	    <div class="form-group">
 		<label for="inputEnabled">Enabled:</label>
@@ -48,7 +48,7 @@
 	var str=document.getElementById('selectControlOrBarriers').value.split(";");
 	document.getElementById("id").value = str[0];
 	document.getElementById("inputid").value = str[0];
-	document.getElementById("selectControlOrBarriers").value = str[1];	
+	document.getElementById("controlOrBarriers").value = str[1];	
 	}
     </script>
 {% endblock %}

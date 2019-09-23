@@ -55,21 +55,17 @@ def index():
                            title='Home')
 
 
-@app.route('/newTailboard')
+@app.route('/newTailboard', methods=['GET','POST'])
 @login_required
 def newTailboard():
+    controlBarriers= ControlBarriers.query.all()
+    presentDangers = PresentDangers.query.all()
+    vehicle = Vehicle.query.all()
+    user = User.query.all()
     db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-
-    return render_template('newTailboard.html', staff=db['staff'].find(enabled=1),
-                           vehicle=db['vehicle'].find(enabled=1),presentDangers=db['presentDangers'].find(enabled=1),controlsBarriers=db['controlsBarriers'].find(enabled=1))
-
-
-@app.route('/handleNewTailboard', methods=['POST'])
-@login_required
-def handleNewTailboard():
-    jobID = int(time())
-    jobDate = strftime('%Y-%m-%d', localtime(jobID))
     if request.method == 'POST':
+        jobID = int(time())
+        jobDate = strftime('%Y-%m-%d', localtime(jobID))
         tailboard = request.form.to_dict(flat=False)
         db = dataset.connect('sqlite:///project/dynamic/db/database.db')
         table = db['tailboard']
@@ -79,7 +75,9 @@ def handleNewTailboard():
             tailboardDict.update({key: x})
         table.insert(tailboardDict)
         newTailboardEmail(jobID)
-    return redirect('/')
+        return redirect('/')
+    return render_template('newTailboard.html', staff=db['staff'].find(enabled=1),
+                           vehicle=vehicle,presentDangers=db['presentDangers'].find(enabled=1),controlsBarriers=db['controlsBarriers'].find(enabled=1))
 
 
 @app.route('/handleTailboardEmail/<token>')
@@ -98,68 +96,6 @@ def handleTailboardEmail(token):
     data = dict(jobID=tokenInfo[1], presentStaffConfirmed=presentStaffConfirmed)
     tailboardData.update(data, ['jobID'])
     return redirect('/')
-
-
-@app.route('/newStaff')
-@login_required
-def newStaff():
-    return render_template('staffNew.html',
-                           title='New Staff')
-
-
-@app.route('/handleNewStaff', methods=['POST'])
-def handleNewStaff():
-    if request.method == 'POST':
-        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        table = db['staff']
-        table.insert(dict(firstName=request.form['inputFirstName'], lastName=request.form['inputLastName'],
-                          corporateID=request.form['inputCorpID'], email=request.form['inputEmail'],
-                          tel=request.form['inputPhoneNumber'], supervisorEmail=request.form['supervisorEmail'],
-                          enabled=True))
-    return redirect('/')
-
-
-@app.route('/removeStaff')
-@login_required
-def removeStaff():
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    table = db['staff']
-    staff = table.find(enabled=True)
-    return render_template('staffRemove.html',
-                           title='New Staff', staff=staff)
-
-
-@app.route('/handleRemoveStaff', methods=['POST'])
-def handleRemoveStaff():
-    if request.method == 'POST':
-        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        table = db['staff']
-        for x in request.form.getlist('removeStaff'):
-            table.update(dict(id=x, enabled=False), ['id'])
-    return redirect('/')
-
-
-@app.route('/editStaff')
-def editStaff():
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    table = db['staff']
-    return render_template('staffEdit.html',
-                           title='New Staff', staff=table)
-
-
-@app.route('/handleEditStaff', methods=['POST'])
-def handleEditStaff():
-    if request.method == 'POST':
-        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        table = db['staff']
-        data = dict(id=request.form['inputid'], firstName=request.form['inputFirstName'],
-                    lastName=request.form['inputLastName'],
-                    corporateID=request.form['inputCorpID'], email=request.form['inputEmail'],
-                    tel=request.form['inputPhoneNumber'], supervisorEmail=request.form['supervisorEmail'],
-                    enabled=request.form['activeStaff'])
-        table.update(data, ['id'])
-    return redirect('/')
-
 
 @app.route('/newVehicle', methods=['GET','POST'])
 def newVehicle():
@@ -212,8 +148,8 @@ def editPresentDangers():
 @app.route('/newControlBarriers', methods=['GET','POST'])
 def newControlBarriers():
     if request.method == 'POST':
-        controlBarriers = ControlBarriers(controlBarriers=request.form['newControlBarriers'],enabled=True)
-        db.session.add(controlBarriers)
+        controlBarrier = ControlBarriers(controlBarriers=request.form['newControlBarriers'],enabled=True)
+        db.session.add(controlBarrier)
         db.session.commit()
         return redirect('/')
     return render_template('controlsBarriersNew.html',
@@ -223,8 +159,9 @@ def newControlBarriers():
 def editControlBarriers():
     controlBarriers= ControlBarriers.query.all()
     if request.method == 'POST':
-        target_presentDangers = PresentDangers.query.filter_by(id=request.form['inputid']).first()
-        target_presentDangers.dangers=request.form['selectControlOrBarriers']
+        target_control_barrier = ControlBarriers.query.filter_by(id=request.form['inputid']).first()
+        target_control_barrier.controlBarriers=request.form['controlOrBarriers']
+        print(request.form)
         db.session.commit()
         return redirect('/')
     return render_template('controlsBarriersEdit.html',

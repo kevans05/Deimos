@@ -13,7 +13,7 @@
             <h1 class="display-3">Create A New Tailboard</h1>
             <p class="lead">Please enter the following information to create a new Tailboard</p>
             <hr class="my-4">
-                <form action="{{ url_for('handleNewTailboard') }}" method="post">
+                <form action="{{ url_for('newTailboard') }}" method="post">
                     <div class="form-group">
                         <label for="presentStaff">Please select the staff that will be included on this tailboard:</label>
                         <select multiple class="form-control" id="presentStaff" name="presentStaff">
