@@ -43,11 +43,7 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-# vehicles_on_tailboard = db.Table(
-#     'vehicles_on_tailboard',
-#     db.Column('vehicle_on_tailboard_id', db.Integer, db.ForeignKey('vehicle.id')),
-#     db.Column('vehicle_added_to_tailboard_id', db.Integer, db.ForeignKey('vehicle.id'))
-# )
+vehicles_on_tailboard = db.Table('vehicles_on_tailboard', db.Column('vehicle_on_tailboard_id', db.Integer, db.ForeignKey('vehicle.id')),db.Column('vehicle_added_to_tailboard_id', db.Integer, db.ForeignKey('vehicle.id')))
 # 
 # present_dangers_on_tailboard = db.Table(
 #     'present_dangers_on_tailboard',
@@ -67,20 +63,29 @@ class User(UserMixin, db.Model):
 #     db.Column('staff_added_to_tailboard_id', db.Integer, db.ForeignKey('user.id'))
 # )
 # 
-# class tailboard(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-#     voltagesPresent = db.Column(db.String(140))
-#     location = db.Column(db.String(140))
-#     jobSteps = db.Column(db.String(140))
-#     hazards = db.Column(db.String(140))
-#     barrriersMitigation 
-# 
-#     vehicle_added_to_tailboard = db.relationship(
-#         'vehicle', secondary=vehicles_on_tailboard,
-#         primaryjoin=(vehicles_on_tailboard.c.vehicle_on_tailboard_id == id),
-#         secondaryjoin=(vehicles_on_tailboard.c.vehicle_added_to_tailboard_id == id),
-#         backref=db.backref('vehicles_on_tailboard', lazy='dynamic'), lazy='dynamic')
+class Tailboard(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    location = db.Column(db.String(256), index=True)
+    jobSteps = db.Column(db.String(1024), index=True)
+    jobHazards = db.Column(db.String(1024), index=True)
+    jobProtectios = db.Column(db.String(1024), index=True)
+    vehicle_added_to_tailboard = db.relationship(
+            'vehicle', secondary=vehicles_on_tailboard,
+            primaryjoin=(vehicles_on_tailboard.c.vehicle_on_tailboard_id == id),
+            secondaryjoin=(vehicles_on_tailboard.c.vehicle_added_to_tailboard_id == id),
+            backref=db.backref('vehicles_on_tailboard', lazy='dynamic'), lazy='dynamic')
+
+#    def add_vehicle(self, vehicle):
+#        if not self.what_vehicles_are_on_tailboard(vehicle):
+#            self.vehicle_added_to_tailboard.append(vehicle)
+#    def remove_vehicle(self, vehicle):
+#        if self.what_vehicles_are_on_tailboard(vehicle):
+#            self.vehicle_added_to_tailboard.remove(vehicle)
+
+#    def what_vehicles_are_on_tailboard(self, vehicle):
+#        return self.vehicle_added_to_tailboard.filter(
+#                vehicles_on_tailboard.c.vehicle_added_to_tailboard_id == vehicle.id).count() > 0
 # 
 #     present_danger_added_to_tailboard = db.relationship(
 #         'presentDangers', secondary=present_dangers_on_tailboard,
@@ -99,19 +104,8 @@ class User(UserMixin, db.Model):
 #         primaryjoin=(staffs_on_tailboard.c.staff_on_tailboard_id == id),
 #         secondaryjoin=(staffs_on_tailboard.c.staff_added_to_tailboard_id == id),
 #         backref=db.backref('staffs_on_tailboard', lazy='dynamic'), lazy='dynamic')
-# 
-#     def add_vehicle(self, vehicle):
-#         if not self.what_vehicles_are_on_tailboard(vehicle):
-#             self.vehicle_added_to_tailboard.append(vehicle)
-# 
-#     def remove_vehicle(self, vehicle):
-#         if self.what_vehicles_are_on_tailboard(vehicle):
-#             self.vehicle_added_to_tailboard.remove(vehicle)
-# 
-#     def what_vehicles_are_on_tailboard(self, vehicle):
-#         return self.vehicle_added_to_tailboard.filter(
-#             vehicles_on_tailboard.c.vehicle_added_to_tailboard_id == vehicle.id).count() > 0
-# 
+
+ 
 #     def add_present_danger(self, present_danger):
 #         if not self.what_present_dangers_are_on_tailboard(present_danger):
 #             self.present_danger_added_to_tailboard.append(present_danger)

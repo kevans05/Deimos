@@ -10,7 +10,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from app import app, db
-from app.models import User, Vehicle, PresentDangers, ControlBarriers
+from app.models import User, Vehicle, PresentDangers, ControlBarriers, Tailboard
 from app.forms import LoginForm, RegistrationForm
 from .basicModules import parse_a_database_return_a_list, parse_a_database_return_a_list_users
 from .email import newTailboardEmail, managers_email_initiate
@@ -62,22 +62,15 @@ def newTailboard():
     presentDangers = PresentDangers.query.all()
     vehicle = Vehicle.query.all()
     user = User.query.all()
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
     if request.method == 'POST':
         jobID = int(time())
         jobDate = strftime('%Y-%m-%d', localtime(jobID))
-        tailboard = request.form.to_dict(flat=False)
-        db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-        table = db['tailboard']
-        tailboardDict = {'jobID': jobID, 'jobDate': jobDate, 'presentStaffConfirmed': None}
-        for key, values in tailboard.items():
-            x = ';'.join(values)
-            tailboardDict.update({key: x})
-        table.insert(tailboardDict)
-        newTailboardEmail(jobID)
+        tailboard = Tailboard(timestamp = datetime.utcnow(),location = request.form['location'], jobSteps = request.form['jobSteps'], jobHazards = request.form['hazards'],jobProtectios=request.form['barrriersMitigation'])
+        db.session.add(tailboard)
+        db.session.commit()
         return redirect('/')
-    return render_template('newTailboard.html', staff=db['staff'].find(enabled=1),
-                           vehicle=vehicle,presentDangers=db['presentDangers'].find(enabled=1),controlsBarriers=db['controlsBarriers'].find(enabled=1))
+    return render_template('newTailboard.html', staff=user,
+                           vehicle=vehicle,presentDangers=presentDangers,controlsBarriers=controlBarriers)
 
 
 @app.route('/handleTailboardEmail/<token>')

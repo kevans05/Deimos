@@ -43,7 +43,7 @@
                         <label for="presentDangers">Please select the Present Dangers on site:</label>
                         <select multiple class="form-control" id="presentDangers" name="presentDangers">
                             {% for o in presentDangers %}
-                                <option value={{ o.id }}>{{ o.danger }}</option>
+                                <option value={{ o.id }}>{{ o.dangers }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -52,7 +52,7 @@
                         <label for="ControlsBarriers">Please select the Controls/Barriers present:</label>
                         <select multiple class="form-control" id="controlsBarriers" name="controlsBarriers">
                             {% for o in controlsBarriers %}
-                                <option value={{ o.id }}>{{ o.controlsBarriers }}</option>
+                                <option value={{ o.id }}>{{ o.controlBarriers }}</option>
                             {% endfor %}
                         </select>
                     </div>
