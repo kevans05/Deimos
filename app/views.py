@@ -11,7 +11,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from app import app, db
 from app.models import User, Vehicle, PresentDangers, ControlBarriers, Tailboard
-from app.forms import LoginForm, RegistrationForm
+#from app.forms import LoginForm, RegistrationForm
 from .basicModules import parse_a_database_return_a_list, parse_a_database_return_a_list_users
 from .email import newTailboardEmail, managers_email_initiate
 from .token import confirm_token
@@ -207,46 +207,38 @@ def handleReminderSettings():
 
 @app.route('/archives')
 def archives():
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    tailboardsTable = db['tailboard']
-    userData = db['staff']
-    tailboard = []
-
-    for user in tailboardsTable:
-        if user["presentStaff"] is not None:
-            if ';' in user["presentStaff"]:
-                users = user["presentStaff"].split(";")
-            else:
-                users = user["presentStaff"]
-            name = ""
-            for fullNames in users:
-                x = userData.find_one(id=fullNames)
-                fullName = (x['firstName'] + " " + x['lastName'] + ";")
-                name = name + fullName
-        tailboardDict = {"jobID": user['jobID'], "jobDate": user['jobDate'], "location": user['location'],
-                         "presentStaff": name}
-        tailboard.append(tailboardDict)
+    controlBarriers = ControlBarriers.query.all()
+    presentDangers = PresentDangers.query.all()
+    vehicle = Vehicle.query.all()
+    user = User.query.all()
+    tailboard = Tailboard.query.all()
+    #
+    # for user in tailboardsTable:
+    #     if user["presentStaff"] is not None:
+    #         if ';' in user["presentStaff"]:
+    #             users = user["presentStaff"].split(";")
+    #         else:
+    #             users = user["presentStaff"]
+    #         name = ""
+    #         for fullNames in users:
+    #             x = userData.find_one(id=fullNames)
+    #             fullName = (x['firstName'] + " " + x['lastName'] + ";")
+    #             name = name + fullName
+    #     tailboardDict = {"jobID": user['jobID'], "jobDate": user['jobDate'], "location": user['location'],
+    #                      "presentStaff": name}
+    #     tailboard.append(tailboardDict)
     return render_template('archives.html',
                            title='archives', page='archives', tailboards=tailboard)
 
 
 @app.route('/handleArchives/<tailboardID>')
 def handleArchives(tailboardID):
-    present_voltage_dictionary = {"ground": False, "lessThan": False, "greaterThen": False}
-    #pull in the database at its current state
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    #in the database find the the tailboard that matches the tailboard ID selected
-    tailboard = db['tailboard'].find_one(jobID=tailboardID)
-    if tailboard['presentVoltages'] is not None:
-        for present_voltage in tailboard['presentVoltages'].split(';'):
-            present_voltage_dictionary[present_voltage] = True
-    return render_template('archiveOutput.html', tailboardData=tailboard,
-                           presentUserData=parse_a_database_return_a_list_users(db,tailboard),
-                           presentVehiclesData=parse_a_database_return_a_list('vehicle',db,tailboard),
-                           presentDangerDic=parse_a_database_return_a_list('presentDangers', db, tailboard),
-                           presentVoltageDic=present_voltage_dictionary,
-                           controlsBarriersDic=parse_a_database_return_a_list('controlsBarriers', db, tailboard),
-                           title=tailboardID, page=tailboardID)
+    tailboard = Tailboard.query.all()
+    #tailboard = db['tailboard'].find_one(jobID=tailboardID)
+    #if tailboard['presentVoltages'] is not None:
+    #    for present_voltage in tailboard['presentVoltages'].split(';'):
+    #        present_voltage_dictionary[present_voltage] = True
+    return render_template('archiveOutput.html', tailboardData=tailboard)
 
 @app.route('/about')
 def about():

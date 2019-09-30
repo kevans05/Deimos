@@ -19,8 +19,8 @@
     <center><h1>Tailboard Report</h1></center>
     <table style="width: 100%">
         <tr>
-            <td><p><strong>Date: </strong><i> {{ tailboardData.jobDate }}</i></p></td>
-            <td><p><strong>Job ID:</strong><i> {{ tailboardData.jobID }}</i></p></td>
+            <td><p><strong>Date: </strong><i> {{ tailboardData.timestamp }}</i></p></td>
+            <td><p><strong>Job ID:</strong><i> {{ tailboardData.id }}</i></p></td>
             <td><p><strong>Job Location:</strong><i> {{ tailboardData.location }}</i></p></td>
         </tr>
     </table>
@@ -31,7 +31,7 @@
     .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color: #b20838;border-top-width:1px;border-bottom-width:1px;}
     .tg .tg-hgcj{font-weight:bold;text-align:center}
     </style>
-
+<!--
     <table class="tg">
         <tr>
             <th class="tg-hgcj" colspan="4">Staff Present<br></th>
@@ -101,6 +101,7 @@
         </tr>
         {% endfor %}
     </table>
+    -->
     <h3>Job Steps:</h3>
     <p>
         {{ tailboardData.jobSteps }}
