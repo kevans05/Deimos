@@ -1,22 +1,16 @@
 import json
 import os
-import dataset
-import xlsxwriter
-import atexit
-from time import time, strftime, localtime
+import csv
+from time import time
 from datetime import datetime
 from flask import render_template, request, redirect, flash, send_from_directory, url_for
 from flask_login import login_user, logout_user, current_user, login_required
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
 from app import app, db
-from app.models import User, Vehicle, PresentDangers, ControlBarriers, Tailboard
-#from app.forms import LoginForm, RegistrationForm
-from .basicModules import parse_a_database_return_a_list, parse_a_database_return_a_list_users
+from app.models import User, Vehicle, Dangers, Barriers, Tailboard, Voltages
 from .email import newTailboardEmail, managers_email_initiate
 from .token import confirm_token
 
-path_d = ["project/dynamic/xlsx","project/dynamic/db"]
+path_d = ["project/dynamic/xlsx"]
 
 @app.before_first_request
 def activate_job():
@@ -28,7 +22,6 @@ def activate_job():
             print("Creation of the directory %s failed" % path)
         else:
             print("Successfully created the directory %s" % path)
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
     managers_email_initiate()
 
 @app.before_request
@@ -51,26 +44,49 @@ def per_request_callbacks(response):
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html',
+    if current_user.is_authenticated:
+        print(current_user.id)
+        return render_template('index.html',
+                title='Current Tailboards')
+    else:
+        return render_template('index.html',
                            title='Home')
-
 
 @app.route('/newTailboard', methods=['GET','POST'])
 @login_required
 def newTailboard():
-    controlBarriers= ControlBarriers.query.all()
-    presentDangers = PresentDangers.query.all()
+    controlBarriers= Barriers.query.all()
+    presentDangers = Dangers.query.all()
     vehicle = Vehicle.query.all()
     user = User.query.all()
+    voltages = Voltages.query.all()
     if request.method == 'POST':
-        jobID = int(time())
-        jobDate = strftime('%Y-%m-%d', localtime(jobID))
-        tailboard = Tailboard(timestamp = datetime.utcnow(),location = request.form['location'], jobSteps = request.form['jobSteps'], jobHazards = request.form['hazards'],jobProtectios=request.form['barrriersMitigation'])
+               
+        tailboard = Tailboard(timestamp = datetime.utcnow(),location = request.form['location'],
+                              jobSteps = request.form['jobSteps'], jobHazards = request.form['hazards'],
+                              jobProtectios=request.form['barrriersMitigation'])
+
+        for i in request.form.getlist("vehicle"):
+            vehicle_to_add = Vehicle.query.get(i)
+            tailboard.add_vehicle(vehicle_to_add)
+        for i in request.form.getlist("presentStaff"):
+            user_to_add = User.query.get(i)
+            tailboard.add_user(user_to_add)
+        for i in request.form.getlist("presentDangers"):
+            present_dangers_to_add = Dangers.query.get(i)
+            tailboard.add_danger(present_dangers_to_add)
+        for i in request.form.getlist("controlsBarriers"):
+            controls_barriers_to_add = Barriers.query.get(i)
+            tailboard.add_barriers(controls_barriers_to_add)
+        for i in request.form.getlist("voltage"):
+            voltage_to_add = Voltages.query.get(i)
+            tailboard.add_voltage(voltage_to_add)
         db.session.add(tailboard)
         db.session.commit()
         return redirect('/')
     return render_template('newTailboard.html', staff=user,
-                           vehicle=vehicle,presentDangers=presentDangers,controlsBarriers=controlBarriers)
+                           vehicle=vehicle,presentDangers=presentDangers,controlsBarriers=controlBarriers,
+                           voltage=voltages)
 
 
 @app.route('/handleTailboardEmail/<token>')
@@ -120,7 +136,7 @@ def editVehicle():
 @app.route('/newPresentDangers', methods=['GET','POST'])
 def newPresentDangers():
     if request.method == 'POST':
-        presentDangers = PresentDangers(dangers=request.form['newPresentDanger'],enabled=True)
+        presentDangers = Dangers(dangers=request.form['newPresentDanger'], enabled=True)
         db.session.add(presentDangers)
         db.session.commit()
         return redirect('/')
@@ -129,9 +145,9 @@ def newPresentDangers():
 
 @app.route('/editPresentDangers', methods=['GET','POST'])
 def editPresentDangers():
-    presentDangers = PresentDangers.query.all()
+    presentDangers = Dangers.query.all()
     if request.method == 'POST':
-        target_presentDangers = PresentDangers.query.filter_by(id=request.form['inputid']).first()
+        target_presentDangers = Dangers.query.filter_by(id=request.form['inputid']).first()
         target_presentDangers.dangers=request.form['inputDangers']
         db.session.commit()
         return redirect('/')
@@ -141,8 +157,8 @@ def editPresentDangers():
 @app.route('/newControlBarriers', methods=['GET','POST'])
 def newControlBarriers():
     if request.method == 'POST':
-        controlBarrier = ControlBarriers(controlBarriers=request.form['newControlBarriers'],enabled=True)
-        db.session.add(controlBarrier)
+        barrier = Barriers(controlBarriers=request.form['newControlBarriers'], enabled=True)
+        db.session.add(barrier)
         db.session.commit()
         return redirect('/')
     return render_template('controlsBarriersNew.html',
@@ -150,15 +166,38 @@ def newControlBarriers():
 
 @app.route('/editControlBarriers', methods=['GET','POST'])
 def editControlBarriers():
-    controlBarriers= ControlBarriers.query.all()
+    controlBarriers= Barriers.query.all()
     if request.method == 'POST':
-        target_control_barrier = ControlBarriers.query.filter_by(id=request.form['inputid']).first()
+        target_control_barrier = Barriers.query.filter_by(id=request.form['inputid']).first()
         target_control_barrier.controlBarriers=request.form['controlOrBarriers']
-        print(request.form)
         db.session.commit()
         return redirect('/')
     return render_template('controlsBarriersEdit.html',
                            title='Present Danger',controlBarriers=controlBarriers)
+
+@app.route('/newVoltages', methods=['GET','POST'])
+def newVoltages():
+    if request.method == 'POST':
+        voltages = Voltages(voltage=request.form['newVoltage'],numberOfWires=request.form['numberOfWires'],
+                            numberOfPhases=request.form['numberOfPhases'], enabled=True)
+        db.session.add(voltages)
+        db.session.commit()
+        return redirect('/')
+    return render_template('voltageNew.html',
+                           title='New Voltage')
+
+@app.route('/editVoltages', methods=['GET','POST'])
+def editVoltages():
+    voltages = Voltages.query.all()
+    if request.method == 'POST':
+        target_voltages = Voltages.query.filter_by(id=request.form['inputid']).first()
+        target_voltages.voltages = request.form['voltages']
+        target_voltages.numberOfWires = request.form['numberOfWires']
+        target_voltages.numberOfPhases = request.form['numberOfPhases']
+        db.session.commit()
+        return redirect('/')
+    return render_template('voltageEdit.html',
+                           title='Voltages',voltage=voltages)
 
 @app.route('/emailSettings')
 def emailSettings():
@@ -207,38 +246,21 @@ def handleReminderSettings():
 
 @app.route('/archives')
 def archives():
-    controlBarriers = ControlBarriers.query.all()
-    presentDangers = PresentDangers.query.all()
-    vehicle = Vehicle.query.all()
-    user = User.query.all()
-    tailboard = Tailboard.query.all()
-    #
-    # for user in tailboardsTable:
-    #     if user["presentStaff"] is not None:
-    #         if ';' in user["presentStaff"]:
-    #             users = user["presentStaff"].split(";")
-    #         else:
-    #             users = user["presentStaff"]
-    #         name = ""
-    #         for fullNames in users:
-    #             x = userData.find_one(id=fullNames)
-    #             fullName = (x['firstName'] + " " + x['lastName'] + ";")
-    #             name = name + fullName
-    #     tailboardDict = {"jobID": user['jobID'], "jobDate": user['jobDate'], "location": user['location'],
-    #                      "presentStaff": name}
-    #     tailboard.append(tailboardDict)
+    tailboards = Tailboard.query.all()
+
     return render_template('archives.html',
-                           title='archives', page='archives', tailboards=tailboard)
+                           title='archives', page='archives', tailboards=tailboards)
 
 
 @app.route('/handleArchives/<tailboardID>')
 def handleArchives(tailboardID):
-    tailboard = Tailboard.query.all()
-    #tailboard = db['tailboard'].find_one(jobID=tailboardID)
-    #if tailboard['presentVoltages'] is not None:
-    #    for present_voltage in tailboard['presentVoltages'].split(';'):
-    #        present_voltage_dictionary[present_voltage] = True
-    return render_template('archiveOutput.html', tailboardData=tailboard)
+    tailboard_current = Tailboard.query.filter_by(id=tailboardID).first()
+    return render_template('archiveOutput.html', tailboard=tailboard_current,
+                           presentUserData = User.query.filter(User.tailboard.any(id=tailboardID)).all(),
+                           presentVehiclesData = Vehicle.query.filter(Vehicle.tailboard.any(id=tailboardID)).all(),
+                           presentDangerDic = Dangers.query.filter(Dangers.tailboard.any(id=tailboardID)).all(),
+                           controlsBarriersDic = Barriers.query.filter(Barriers.tailboard.any(id=tailboardID)).all(),
+                           voltageDic = Voltages.query.filter(Voltages.tailboard.any(id=tailboardID)).all())
 
 @app.route('/about')
 def about():
@@ -283,83 +305,13 @@ def logout():
 
 @app.route('/exportDataBase.xlsx')
 def exportDataBase():
-    filename = str(int(time())) + 'databaseExport.xlsx'
+    filename = str(int(time())) + 'databaseExport.csv'
     fileLocation = 'dynamic/xlsx/'
     fileNameCreatWorkbook = fileLocation + filename
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    tailboardsTable = db['tailboard']
-    userData = db['staff']
-    vehicleData = db['vehicle']
-    presentDangersData = db['presentDangers']
-    controlsBarriersData = db['controlsBarriers']
-    workbook = xlsxwriter.Workbook('project/' + fileNameCreatWorkbook)
-    worksheet = workbook.add_worksheet()
 
-    worksheet.write(0, 0, 'Job ID')
-    worksheet.write(0, 1, 'Date')
-    worksheet.write(0, 2, 'Voltages')
-    worksheet.write(0, 3, 'Present Dangers')
-    worksheet.write(0, 4, 'Controls Barriers')
-    worksheet.write(0, 5, 'Location')
-    worksheet.write(0, 6, 'Job Steps')
-    worksheet.write(0, 7, 'Hazards')
-    worksheet.write(0, 8, 'Barrriers Mitigation')
-    worksheet.write(0, 9, 'Present Staff')
-    worksheet.write(0, 10, 'Present Staff Confirmed')
-    worksheet.write(0, 11, 'present Vehicles')
+    tailboards = Tailboard.query.all()
 
-    row = 1
-
-    for tailboards in tailboardsTable:
-        worksheet.write(row, 0, tailboards['jobID'])
-        worksheet.write(row, 1, tailboards['jobDate'])
-        worksheet.write(row, 2, tailboards['presentVoltages'])
-        worksheet.write(row, 5, tailboards['location'])
-        worksheet.write(row, 6, tailboards['jobSteps'])
-        worksheet.write(row, 7, tailboards['hazards'])
-        worksheet.write(row, 8, tailboards['barrriersMitigation'])
-
-        usersNameText = ""
-        if tailboards['presentStaff'] is not None:
-            presentUsersList = tailboards['presentStaff'].split(";")
-            for users in presentUsersList:
-                x = userData.find_one(id=users)
-                usersNameText = x['firstName'] + " " + x['lastName'] + ";" + usersNameText
-        worksheet.write(row, 9, usersNameText)
-        presentUsersNameText = ""
-        if tailboards['presentStaffConfirmed'] is not None:
-            presentStaffConfirmed = tailboards['presentStaffConfirmed'].split(";")
-            for users in presentStaffConfirmed:
-                if len(users) > 0:
-                    x = userData.find_one(id=users)
-                    presentUsersNameText = x['firstName'] + " " + x['lastName'] + ";" + presentUsersNameText
-        worksheet.write(row, 10, presentUsersNameText)
-        vehicleText = ""
-        if tailboards['vehicle'] is not None:
-            vehicleList = tailboards['vehicle'].split(";")
-            for vehicle in vehicleList:
-                x = vehicleData.find_one(id=vehicle)
-                vehicleText = x['corporationID'] + ";" + vehicleText
-        worksheet.write(row, 11, vehicleText)
-        presentDangersText = ""
-        if tailboards['presentDangers'] is not None:
-            presentDangersList = tailboards['presentDangers'].split(";")
-            for presentDangers in presentDangersList:
-                x = presentDangersData.find_one(id=presentDangers)
-                presentDangersText = x['danger'] + ";" + presentDangersText
-        worksheet.write(row, 3, presentDangersText)
-        controlsBarriersText = ""
-        if tailboards['controlsBarriers'] is not None:
-            controlsBarriersList = tailboards['controlsBarriers'].split(";")
-            for controlsBarriers in controlsBarriersList:
-                x = controlsBarriersData.find_one(id=controlsBarriers)
-                controlsBarriersText = x['controlsBarriers'] + ";" + controlsBarriersText
-        worksheet.write(row, 4, controlsBarriersText)
-        row += 1
-
-    workbook.close()
-    return send_from_directory(fileLocation, filename)
-
+    return redirect(url_for('index'))
 
 
 

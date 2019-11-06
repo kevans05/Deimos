@@ -4,6 +4,39 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from datetime import datetime
 
+vehicle_association_table = db.Table(
+    'vehicle_association_table',
+    db.Column('Vehicle_id', db.Integer, db.ForeignKey('vehicle.id')),
+    db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id'))
+)
+
+dangers_association_table = db.Table(
+    'dangers_association_table',
+    db.Column('Dangers_id', db.Integer, db.ForeignKey('dangers.id')),
+    db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id'))
+)
+
+
+barriers_association_table = db.Table(
+    'barriers_association_table',
+    db.Column('Barriers_id', db.Integer, db.ForeignKey('barriers.id')),
+    db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id'))
+)
+
+users_association_table = db.Table(
+    'users_association_table',
+    db.Column('User_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id')),
+    db.Column('Tailboard_signed_on', db.Boolean),
+    db.Column('Tailboard_work_compleate', db.Boolean)
+)
+
+voltage_association_table = db.Table(
+    'voltage_association_table',
+    db.Column('Voltage_id', db.Integer, db.ForeignKey('voltages.id')),
+    db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id'))
+)
+
 class Vehicle(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nickname = db.Column(db.String(64), index=True)
@@ -12,15 +45,22 @@ class Vehicle(db.Model):
     model = db.Column(db.String(64), index=True)
     enabled = db.Column(db.Boolean, index=True)
 
-class PresentDangers(db.Model):
+class Dangers(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     dangers = db.Column(db.String(64), index=True, unique=True)
     enabled = db.Column(db.Boolean, index=True)
 
-class ControlBarriers(db.Model):
+class Voltages(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    voltage = db.Column(db.String(64), index=True)
+    numberOfPhases = db.Column(db.Integer, index=True)
+    numberOfWires = db.Column(db.Integer, index=True)
+    enabled = db.Column(db.Boolean, index=True)
+
+class Barriers(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     controlBarriers = db.Column(db.String(64), index=True, unique=True)
-    enabled = db.Column(db.Boolean, index=True, unique=True)
+    enabled = db.Column(db.Boolean, index=True)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -42,27 +82,46 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-vehicles_on_tailboard = db.Table('vehicles_on_tailboard',
-                                 db.Column('vehicle_id', db.Integer, db.ForeignKey('user.id')),
-                                 db.Column('tailboard_id', db.Integer, db.ForeignKey('user.id'))
-                                 )
 
 class Tailboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     location = db.Column(db.String(256), index=True)
     jobSteps = db.Column(db.String(1024), index=True)
+    presentVoltages = db.Column(db.String(256), index=True)
     jobHazards = db.Column(db.String(1024), index=True)
     jobProtectios = db.Column(db.String(1024), index=True)
-    tailboard_vehicle = db.relationship(
-        'Tailboard', secondary=vehicles_on_tailboard,
-        primaryjoin=(vehicles_on_tailboard.c.vehicle_id == id),
-        secondaryjoin=(vehicles_on_tailboard.c.tailboard_id == id),
-        backref=db.backref('vehicles_on_tailboard', lazy='dynamic'), lazy='dynamic')
+    tailboard_vehicle = db.relationship('Vehicle', secondary=vehicle_association_table,
+                            backref=db.backref('tailboard', lazy='dynamic'))
 
-    def check_vehicles(self, tailboard):
-        return self.followed.filter(
-            vehicles_on_tailboard.c.tailboard_id == tailboard.id).count() > 0
+    tailboard_dangers = db.relationship('Dangers', secondary=dangers_association_table,
+                            backref=db.backref('tailboard', lazy='dynamic'))
+
+    tailboard_barriers = db.relationship('Barriers', secondary=barriers_association_table,
+                            backref=db.backref('tailboard', lazy='dynamic'))
+
+    tailboard_users = db.relationship('User', secondary=users_association_table,
+                            backref=db.backref('tailboard', lazy='dynamic'))
+
+    tailboard_voltage = db.relationship('Voltages', secondary=voltage_association_table,
+                                      backref=db.backref('tailboard', lazy='dynamic'))
+
+    def __repr__(self):
+        return '<Tailboard %r>' % self.id
+
+    def add_vehicle(self, vehicle):
+        self.tailboard_vehicle.append(vehicle)
+
+    def add_user(self, user):
+        self.tailboard_users.append(user)
+
+    def add_danger(self, danger):
+        self.tailboard_dangers.append(danger)
+
+    def add_barriers(self, barriers):
+        self.tailboard_barriers.append(barriers)
+    def add_voltage(self, voltage):
+        self.tailboard_voltage.append(voltage)
 
 @login.user_loader
 def load_user(id):

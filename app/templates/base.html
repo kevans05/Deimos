@@ -38,8 +38,8 @@
                 <ul class="nav navbar-nav mr-auto">
 		    {% if current_user.is_anonymous %}
 		    {% else %}
+                    <a class="nav-item nav-link" href="{{ url_for('index') }}">Current Tailboard</a>
                     <a class="nav-item nav-link" href="{{ url_for('newTailboard') }}">New Tailboard</a>
-                    
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuvehicle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Vehicle
@@ -70,6 +70,16 @@
                     </li>
 
                     <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarVoltages" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Voltages
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuVoltages">
+                            <a class="dropdown-item" href="{{ url_for('newVoltages') }}">New voltages</a>
+                            <a class="dropdown-item" href="{{ url_for('editVoltages') }}">Edit Voltages</a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuReports" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Reports
                         </a>
@@ -79,6 +89,7 @@
                             <a class="dropdown-item disabled" href="#">Statistics</a>
                         </div>
                     </li>
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuSettings" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Settings

@@ -1,4 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
+    {% if current_user.is_anonymous %}
+    {% else %}
+        <div class="container-fluid">
+            <div class="jumbotron">
+                <h1 class="display-3">Your Current Tailboards</h1>
+                <p class="lead">Taillboard's you are currently on</p>
+                <hr class="my-4">
+                <p class="lead">Taillboard's you need to approve or reject</p>
+                <hr>
+
+            </div>
+        </div>
+    {% endif %}
 
 {% endblock %}

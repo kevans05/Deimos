@@ -19,9 +19,9 @@
     <center><h1>Tailboard Report</h1></center>
     <table style="width: 100%">
         <tr>
-            <td><p><strong>Date: </strong><i> {{ tailboardData.timestamp }}</i></p></td>
-            <td><p><strong>Job ID:</strong><i> {{ tailboardData.id }}</i></p></td>
-            <td><p><strong>Job Location:</strong><i> {{ tailboardData.location }}</i></p></td>
+            <td><p><strong>Date: </strong><i> {{ tailboard.timestamp }}</i></p></td>
+            <td><p><strong>Job ID:</strong><i> {{ tailboard.id }}</i></p></td>
+            <td><p><strong>Job Location:</strong><i> {{ tailboard.location }}</i></p></td>
         </tr>
     </table>
 
@@ -31,7 +31,6 @@
     .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color: #b20838;border-top-width:1px;border-bottom-width:1px;}
     .tg .tg-hgcj{font-weight:bold;text-align:center}
     </style>
-<!--
     <table class="tg">
         <tr>
             <th class="tg-hgcj" colspan="4">Staff Present<br></th>
@@ -46,7 +45,6 @@
         {% endfor %}
     </table>
     <br>
-
     <table class="tg">
         <tr>
             <th class="tg-hgcj" colspan="4">Vehicles Present<br></th>
@@ -63,58 +61,55 @@
     <br>
     <table class="tg">
         <tr>
-            <th class="tg-hgcj" colspan="6">Voltage Present<br></th>
+            <th class="tg-hgcj" colspan="3">Present Voltages<br></th>
         </tr>
+       {% for o in voltageDic %}
         <tr>
-            <td class="tg-031e" style="width: 28.33%"><strong>Grounded:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.ground %}&#10003; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 28.33%"><strong>Less Then or Equal To 750V:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.lessThan %}&#10003; {%  endif %}</td>
-
-            <td class="tg-031e" style="width: 28.33%"><strong>Greater Then 750V:</strong></td>
-            <td class="tg-031e" style="width: 5%">{% if presentVoltageDic.greaterThen %}&#10003; {%  endif %}</td>
+            <td class="tg-031e" style="width: 40%">{{ o.voltage }}</td>
+            <td class="tg-031e" style="width: 30%">Phases: {{ o.numberOfPhases }}</td>
+            <td class="tg-031e" style="width: 30%">Wires: {{ o.numberOfWires }}</td>
         </tr>
+        {% endfor %}
     </table>
-    <br>
-
+<br>
     <table class="tg">
         <tr>
             <th class="tg-hgcj" >Present Dangers Present<br></th>
         </tr>
        {% for o in presentDangerDic %}
         <tr>
-            <td class="tg-031e">{{ o.danger }}</td>
+            <td class="tg-031e">{{ o.dangers }}</td>
         </tr>
         {% endfor %}
-
     </table>
 <br>
-
     <table class="tg">
         <tr>
             <th class="tg-hgcj">Controls/Barriers Present<br></th>
         </tr>
         {% for o in controlsBarriersDic %}
         <tr>
-            <td class="tg-031e">{{ o.controlsBarriers }}</td>
+            <td class="tg-031e">{{ o.controlBarriers }}</td>
         </tr>
         {% endfor %}
     </table>
-    -->
+
+    <br>
+
     <h3>Job Steps:</h3>
     <p>
-        {{ tailboardData.jobSteps }}
+        {{ tailboard.jobSteps }}
     </p>
 
     <h3>Hazards:</h3>
     <p>
-        {{ tailboardData.hazards }}
+        {{ tailboard.jobHazards }}
     </p>
 
     <h3>Protections:</h3>
     <p>
-        {{ tailboardData.barrriersMitigation }}
+        {{ tailboard.jobProtectios }}
+	
     </p>
 
 </section>
