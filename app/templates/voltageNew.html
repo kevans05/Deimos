@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="jumbotron">
+        <h1 class="display-3">Create A New Voltages</h1>
+        <p class="lead">Enter a new Voltages to be included on the on-line tailboard</p>
+        <hr class="my-4">
+            <form action="{{ url_for('newVoltages') }}" method="post">
+                <div class="form-group">
+                    <label for="newVoltage">Please select the New Voltage present:</label>
+                    <input type="text" class="form-control" id="newVoltage" name="newVoltage" aria-describedby="newVoltage" placeholder="600V"  required>
+                    <label for="numberOfPhases">Please select the number of phases present:</label>
+                    <input type="number" class="form-control" id="numberOfPhases" name="numberOfPhases" aria-describedby="numberOfPhases" placeholder="3"  required>
+                    <label for="numberOfWires">Please select the wires present:</label>
+                    <input type="number" class="form-control" id="numberOfWires" name="numberOfWires" aria-describedby="numberOfWires" placeholder="2"  required>
+                 </div>
+                <br>
+                <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+            </form>
+    </div>
+</div>
+{% endblock %}
