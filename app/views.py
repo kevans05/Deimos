@@ -52,6 +52,12 @@ def index():
         return render_template('index.html',
                            title='Home')
 
+@app.route('/signOffTailboard')
+def signOffTailboard():
+    return redirect('/')
+
+
+
 @app.route('/newTailboard', methods=['GET','POST'])
 @login_required
 def newTailboard():
