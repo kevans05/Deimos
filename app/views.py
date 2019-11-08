@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import render_template, request, redirect, flash, send_from_directory, url_for
 from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db
-from app.models import User, Vehicle, Dangers, Barriers, Tailboard, Voltages
+from app.models import User, Vehicle, Dangers, Barriers, Tailboard, Voltages, get_current_registared_tailboards, get_current_working_tailboards
 from .email import newTailboardEmail, managers_email_initiate
 from .token import confirm_token
 
@@ -45,9 +45,9 @@ def per_request_callbacks(response):
 @app.route('/index')
 def index():
     if current_user.is_authenticated:
-        print(current_user.id)
         return render_template('index.html',
-                title='Current Tailboards')
+                title='Current Tailboards',myTailboards=get_current_registared_tailboards(current_user.id),
+                workingTailboars=get_current_working_tailboards(current_user.id))
     else:
         return render_template('index.html',
                            title='Home')

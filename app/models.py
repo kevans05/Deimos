@@ -81,7 +81,8 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-
+    
+       
 
 class Tailboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -122,6 +123,16 @@ class Tailboard(db.Model):
         self.tailboard_barriers.append(barriers)
     def add_voltage(self, voltage):
         self.tailboard_voltage.append(voltage)
+
+def get_current_registared_tailboards(id):
+    current_tailboards = Tailboard.query.join(users_association_table).join(User).filter((users_association_table.c.User_id == id) & (users_association_table.c.Tailboard_signed_on is not True or False) ).all()
+    return(current_tailboards)
+
+def get_current_working_tailboards(id):
+    current_tailboards = Tailboard.query.join(users_association_table).join(User).filter((users_association_table.c.User_id == id) & (users_association_table.c.Tailboard_signed_on is True) & (users_association_table.c.Tailboard_work_compleate)).all()
+    return(current_tailboards)
+
+
 
 @login.user_loader
 def load_user(id):

@@ -17,7 +17,6 @@
                 <tr>
                     <th>Tailboard ID<br></th>
                     <th>Date</th>
-                    <th>Staff<br></th>
                     <th>Location<br></th>
                     <th>Print</th>
                 </tr>
@@ -27,7 +26,7 @@
                 <tr>
                     <td>{{ o.id }}</td>
                     <td>{{ o.timestamp }}</td>
-                    <td>{{ o.presentStaff }}</td>
+
                     <td>{{ o.location }}</td>
                     <td><button type="button" class="btn btn-info" onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">Load</button></td>
                 </tr>

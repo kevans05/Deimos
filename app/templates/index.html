@@ -6,10 +6,57 @@
             <div class="jumbotron">
                 <h1 class="display-3">Your Current Tailboards</h1>
                 <p class="lead">Taillboard's you are currently on</p>
+			<table id="archiveInfo" class="tablesorter" style="width: 100%">
+				<thead>
+					<tr>
+						<th>Tailboard ID<br></th>
+						<th>Date</th>
+						<th>Location<br></th>
+						<th>View Tailboard</th>
+						<th>Sign off of this Tailboard</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for o in workingTailboards %}
+					<tr>
+						<td>{{ o.id }}</td>
+						<td>{{ o.timestamp }}</td>
+						<td>{{ o.location }}</td>
+						<td><button type="button" class="btn btn-info"  onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,scrollbars=yes,status=yes');">View</button></td>	
+						<td><button type="button" class="btn btn-success" onclick="window.open('{{ url_for('signOffTailboard',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,scrollbars=yes,status=yes');">Accept</button></td>
+
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
                 <hr class="my-4">
                 <p class="lead">Taillboard's you need to approve or reject</p>
                 <hr>
+			<table id="archiveInfo" class="tablesorter" style="width: 100%">
+				<thead>
+					<tr>
+						<th>Tailboard ID<br></th>
+						<th>Date</th>
+						<th>Location<br></th>
+						<th>View Tailboard</th>
+						<th>Join the Tailboard</th>
+						<th>Refuse this Tailboard</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for o in myTailboards %}
+					<tr>
+						<td>{{ o.id }}</td>
+						<td>{{ o.timestamp }}</td>
+						<td>{{ o.location }}</td>
+						<td><button type="button" class="btn btn-info" onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">View</button></td>
+						<td><button type="button" class="btn btn-success" onclick="window.open('{{ url_for('joinTailboard',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">Accept</button></td>
+						<td><button type="button" class="btn btn-danger" onclick="window.open('{{ url_for('refuesTailboard',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">Decline</bu`tton></td>
 
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
             </div>
         </div>
     {% endif %}
