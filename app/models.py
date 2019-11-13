@@ -102,7 +102,7 @@ class Tailboard(db.Model):
                             backref=db.backref('tailboard', lazy='dynamic'))
 
     tailboard_users = db.relationship('User', secondary=users_association_table,
-                            backref=db.backref('tailboard', lazy='dynamic'))
+                            backref=db.backref('tailboard',lazy='dynamic'))
 
     tailboard_voltage = db.relationship('Voltages', secondary=voltage_association_table,
                                       backref=db.backref('tailboard', lazy='dynamic'))
@@ -121,19 +121,16 @@ class Tailboard(db.Model):
 
     def add_barriers(self, barriers):
         self.tailboard_barriers.append(barriers)
+
     def add_voltage(self, voltage):
         self.tailboard_voltage.append(voltage)
 
-def get_current_registared_tailboards(id):
-    current_tailboards = Tailboard.query.join(users_association_table).join(User).filter((users_association_table.c.User_id == id) & (users_association_table.c.Tailboard_signed_on is not True or False) ).all()
-    return(current_tailboards)
-
-def get_current_working_tailboards(id):
-    current_tailboards = Tailboard.query.join(users_association_table).join(User).filter((users_association_table.c.User_id == id) & (users_association_table.c.Tailboard_signed_on is True) & (users_association_table.c.Tailboard_work_compleate)).all()
-    return(current_tailboards)
-
-
-
+    def tailboard_user_lookup(self, user_id):
+        print("*"*100)
+        for x in self.tailboard_users:
+            if x.id is user_id:    
+                print(x)
+        #z = self.tailboard_users.filter(users_association_table.c.User_id == user_id)
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))

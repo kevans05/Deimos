@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import render_template, request, redirect, flash, send_from_directory, url_for
 from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db
-from app.models import User, Vehicle, Dangers, Barriers, Tailboard, Voltages, get_current_registared_tailboards, get_current_working_tailboards
+from app.models import User, Vehicle, Dangers, Barriers, Tailboard, Voltages
 from .email import newTailboardEmail, managers_email_initiate
 from .token import confirm_token
 
@@ -45,17 +45,26 @@ def per_request_callbacks(response):
 @app.route('/index')
 def index():
     if current_user.is_authenticated:
+        for x in Tailboard.query.all():
+            x.tailboard_user_lookup(x.id)
         return render_template('index.html',
-                title='Current Tailboards',myTailboards=get_current_registared_tailboards(current_user.id),
-                workingTailboars=get_current_working_tailboards(current_user.id))
+                title='Current Tailboards')
     else:
         return render_template('index.html',
                            title='Home')
 
-@app.route('/signOffTailboard')
-def signOffTailboard():
+@app.route('/signOffTailboard/<tailboardID>')
+def signOffTailboard(tailboardID):
     return redirect('/')
 
+@app.route('/joinTailboard/<tailboardID>')
+def joinTailboard(tailboardID):
+    return redirect('/')
+
+
+@app.route('/refuesTailboard/<tailboardID>')
+def refuseTailboard(tailboardID):    
+    return redirect('/')
 
 
 @app.route('/newTailboard', methods=['GET','POST'])

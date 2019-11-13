@@ -23,7 +23,7 @@
 						<td>{{ o.timestamp }}</td>
 						<td>{{ o.location }}</td>
 						<td><button type="button" class="btn btn-info"  onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,scrollbars=yes,status=yes');">View</button></td>	
-						<td><button type="button" class="btn btn-success" onclick="window.open('{{ url_for('signOffTailboard',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,scrollbars=yes,status=yes');">Accept</button></td>
+						<td><button type="button" class="btn btn-success" onclick="open('{{ url_for('signOffTailboard',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,scrollbars=yes,status=yes');">Accept</button></td>
 
 					</tr>
 					{% endfor %}
@@ -50,8 +50,8 @@
 						<td>{{ o.timestamp }}</td>
 						<td>{{ o.location }}</td>
 						<td><button type="button" class="btn btn-info" onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">View</button></td>
-						<td><button type="button" class="btn btn-success" onclick="window.open('{{ url_for('joinTailboard',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">Accept</button></td>
-						<td><button type="button" class="btn btn-danger" onclick="window.open('{{ url_for('refuesTailboard',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">Decline</bu`tton></td>
+						<td><a href='{{ url_for('joinTailboard',tailboardID=o.id) }}'><button type="button" class="btn btn-success")>Accept</button></a></td>
+						<td><button type="button" class="btn btn-danger" onclick="open('{{ url_for('refuesTailboard',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">Decline</bu`tton></td>
 
 					</tr>
 					{% endfor %}
