@@ -7,7 +7,7 @@ from datetime import datetime
 vehicle_association_table = db.Table(
     'vehicle_association_table',
     db.Column('Vehicle_id', db.Integer, db.ForeignKey('vehicle.id')),
-    db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id'))
+    db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id')),
 )
 
 dangers_association_table = db.Table(
@@ -23,18 +23,18 @@ barriers_association_table = db.Table(
     db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id'))
 )
 
-users_association_table = db.Table(
-    'users_association_table',
-    db.Column('User_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id')),
-    db.Column('Tailboard_signed_on', db.Boolean),
-    db.Column('Tailboard_work_compleate', db.Boolean)
-)
 
 voltage_association_table = db.Table(
     'voltage_association_table',
     db.Column('Voltage_id', db.Integer, db.ForeignKey('voltages.id')),
     db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id'))
+)
+
+
+users_association_table = db.Table(
+     'users_association_table',
+     db.Column('User_id', db.Integer, db.ForeignKey('user.id')),
+     db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id'))
 )
 
 class Vehicle(db.Model):
@@ -72,7 +72,6 @@ class User(UserMixin, db.Model):
     supervisorEmail = db.Column(db.String(128), index=True)
     enabled = db.Column(db.Boolean, index=True)
     password_hash = db.Column(db.String(128))
-
     def __repr__(self):
         return '<Email {}>'.format(self.email)
 
@@ -81,8 +80,7 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-    
-       
+
 
 class Tailboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -102,19 +100,17 @@ class Tailboard(db.Model):
                             backref=db.backref('tailboard', lazy='dynamic'))
 
     tailboard_users = db.relationship('User', secondary=users_association_table,
-                            backref=db.backref('tailboard',lazy='dynamic'))
+                                     backref=db.backref('tailboard',lazy='dynamic'))
+
 
     tailboard_voltage = db.relationship('Voltages', secondary=voltage_association_table,
-                                      backref=db.backref('tailboard', lazy='dynamic'))
+                                                  backref=db.backref('tailboard', lazy='dynamic'))
 
     def __repr__(self):
         return '<Tailboard %r>' % self.id
 
     def add_vehicle(self, vehicle):
         self.tailboard_vehicle.append(vehicle)
-
-    def add_user(self, user):
-        self.tailboard_users.append(user)
 
     def add_danger(self, danger):
         self.tailboard_dangers.append(danger)
@@ -125,12 +121,10 @@ class Tailboard(db.Model):
     def add_voltage(self, voltage):
         self.tailboard_voltage.append(voltage)
 
-    def tailboard_user_lookup(self, user_id):
-        print("*"*100)
-        for x in self.tailboard_users:
-            if x.id is user_id:    
-                print(x)
-        #z = self.tailboard_users.filter(users_association_table.c.User_id == user_id)
+    def add_user(self, user):
+        self.tailboard_users.append(user)
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+

@@ -45,8 +45,12 @@ def per_request_callbacks(response):
 @app.route('/index')
 def index():
     if current_user.is_authenticated:
-        for x in Tailboard.query.all():
-            x.tailboard_user_lookup(x.id)
+        #ok this will pull only the current users
+        tailboard = Tailboard.query.join(Tailboard.tailboard_users).filter_by(id=current_user.id).all()
+        for x in tailboard:
+            print(x)
+            # ok so this pulls everything
+        #print(Tailboard.query.filter(User.tailboard.any(id=current_user.id)).all())
         return render_template('index.html',
                 title='Current Tailboards')
     else:
