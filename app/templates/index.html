@@ -22,8 +22,12 @@
 						<td>{{ o.id }}</td>
 						<td>{{ o.timestamp }}</td>
 						<td>{{ o.location }}</td>
-						<td><button type="button" class="btn btn-info"  onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,scrollbars=yes,status=yes');">View</button></td>	
-						<td><button type="button" class="btn btn-success" onclick="open('{{ url_for('signOffTailboard',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,scrollbars=yes,status=yes');">Accept</button></td>
+						<td>
+							<button type="button" class="btn btn-info"  onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,scrollbars=yes,status=yes');">View</button>
+						</td>	
+						<td>
+							<button type="button" class="btn btn-success" onclick="window.open('{{ url_for('signOffTailboard',tailboardID=o.id) }}', '_self');">Accept</button>
+						</td>
 
 					</tr>
 					{% endfor %}
@@ -38,9 +42,9 @@
 						<th>Tailboard ID<br></th>
 						<th>Date</th>
 						<th>Location<br></th>
-						<th>View Tailboard</th>
-						<th>Join the Tailboard</th>
-						<th>Refuse this Tailboard</th>
+						<th align="center">View Tailboard</th>
+						<th align="center">Join the Tailboard</th>
+						<th align="center">Refuse this Tailboard</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -49,9 +53,15 @@
 						<td>{{ o.id }}</td>
 						<td>{{ o.timestamp }}</td>
 						<td>{{ o.location }}</td>
-						<td><button type="button" class="btn btn-info" onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">View</button></td>
-						<td><a href='{{ url_for('joinTailboard',tailboardID=o.id) }}'><button type="button" class="btn btn-success")>Accept</button></a></td>
-						<td><button type="button" class="btn btn-danger" onclick="open('{{ url_for('refuesTailboard',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">Decline</bu`tton></td>
+						<td align="center">
+							<button type="button" class="btn btn-info" onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">View</button>
+						</td>
+						<td align="center">
+							<button type="button" class="btn btn-success" onclick="window.open('{{ url_for('joinTailboard',tailboardID=o.id) }}', '_self');">Accept</button>
+						</td>
+						<td align="center">
+							<button type="button" class="btn btn-danger" onclick="window.open('{{ url_for('refuseTailboard',tailboardID=o.id) }}', '_self');">Reject</button>
+						</td>
 
 					</tr>
 					{% endfor %}

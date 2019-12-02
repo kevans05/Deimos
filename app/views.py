@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import render_template, request, redirect, flash, send_from_directory, url_for
 from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db
-from app.models import User, Vehicle, Dangers, Barriers, Tailboard, Voltages
+from app.models import User, Vehicle, Dangers, Barriers, Tailboard, Voltages, Tailboard_Users
 from .email import newTailboardEmail, managers_email_initiate
 from .token import confirm_token
 
@@ -45,29 +45,36 @@ def per_request_callbacks(response):
 @app.route('/index')
 def index():
     if current_user.is_authenticated:
-        #ok this will pull only the current users
-        tailboard = Tailboard.query.join(Tailboard.tailboard_users).filter_by(id=current_user.id).all()
-        for x in tailboard:
-            print(x)
-            # ok so this pulls everything
-        #print(Tailboard.query.filter(User.tailboard.any(id=current_user.id)).all())
+        myTailboards = Tailboard.query.join(Tailboard_Users).join(User).filter((Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.sign_on_time == None) ).all()
+
+        workingTailboards = Tailboard.query.join(Tailboard_Users).join(User).filter((Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.sign_on_time > datetime(year=1971,month=1,day=1,hour=0,minute=0,second=0,microsecond=0)) & (Tailboard_Users.sign_off_time == None)).all()
+
         return render_template('index.html',
-                title='Current Tailboards')
+                title='Current Tailboards',myTailboards=myTailboards, workingTailboards=workingTailboards)
     else:
         return render_template('index.html',
                            title='Home')
 
 @app.route('/signOffTailboard/<tailboardID>')
 def signOffTailboard(tailboardID):
+    tailboardToJoin = Tailboard_Users.query.filter((Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
+    tailboardToJoin.sign_off_time = datetime.utcnow()
+    db.session.commit() 
     return redirect('/')
 
 @app.route('/joinTailboard/<tailboardID>')
 def joinTailboard(tailboardID):
+    tailboardToJoin = Tailboard_Users.query.filter((Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
+    tailboardToJoin.sign_on_time = datetime.utcnow()
+    db.session.commit() 
     return redirect('/')
 
 
 @app.route('/refuesTailboard/<tailboardID>')
 def refuseTailboard(tailboardID):    
+    tailboardToJoin = Tailboard_Users.query.filter((Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
+    tailboardToJoin.sign_on_time = datetime(year=1970,month=1,day=1,hour=0,minute=0,second=0,microsecond=0)
+    db.session.commit()
     return redirect('/')
 
 
