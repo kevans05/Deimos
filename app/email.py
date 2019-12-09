@@ -12,8 +12,8 @@ import dataset
 import atexit
 import json
 
-
 from app import app
+from app.models import User, Vehicle, Dangers, Barriers, Tailboard, Voltages, Tailboard_Users
 from .token import generate_confirmation_token
 from .basicModules import parse_a_database_return_a_list_users, parse_a_database_return_a_list
 
@@ -21,8 +21,6 @@ from .basicModules import parse_a_database_return_a_list_users, parse_a_database
 def send_async_email(app, msg):
     with app.app_context():
         mail.send(msg)
-
-
 
 # Function: sendEmail
 # ----------------------------
@@ -38,11 +36,11 @@ def send_async_email(app, msg):
 #       this function uses the flask mail functions to send an email - currently it is only being used by the new_
 #       tailboard_email function but will be used when the managers get a daily summery
 
-def sendEmail(subject, sender, recipients, html_body):
+def send_email(subject, sender, recipients, text_body, html_body):
     msg = Message(subject, sender=sender, recipients=recipients)
+    msg.body = text_body
     msg.html = html_body
-    thr = Thread(target=send_async_email, args=[app, msg])
-    thr.start()
+    Thread(target=send_async_email, args=(app, msg)).start()
 
 
 # Function: newTailboardEmail
@@ -55,35 +53,23 @@ def sendEmail(subject, sender, recipients, html_body):
 #   DESCRIPTION:
 #       the software looks threw all the database, parses out all the complex data and preps it for an email.
 
-def newTailboardEmail(tailboardID):
-    present_voltage_dictionary = {"ground": False, "lessThan": False, "greaterThen": False}
-    # pull in the database at its current state
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    # in the database find the the tailboard that matches the tailboard ID selected
-    tailboard = db['tailboard'].find_one(jobID=tailboardID)
-    if tailboard['presentVoltages'] is not None:
-        for present_voltage in tailboard['presentVoltages'].split(';'):
-            present_voltage_dictionary[present_voltage] = True
-
-    list_of_users = parse_a_database_return_a_list_users(db, tailboard)
-    for users in list_of_users:
-        token = generate_confirmation_token([users['id'], tailboardID])
-        confirm_url = url_for('handleTailboardEmail', token=token, _external=True)
-        sendEmail("You have been included in Tailboard: %s - %s" % (tailboardID, str(tailboard['location'])),
-                  "evansk@londonhydro.com",
-                  [users['email']], render_template('archiveOutputEmail.html', tailboardData=tailboard,
-                                                    presentUserData=list_of_users,
-                                                    presentVehiclesData=parse_a_database_return_a_list('vehicle', db,
-                                                                                                       tailboard),
-                                                    presentDangerDic=parse_a_database_return_a_list('presentDangers',
-                                                                                                    db, tailboard),
-                                                    presentVoltageDic=present_voltage_dictionary,
-                                                    controlsBarriersDic=parse_a_database_return_a_list(
-                                                        'controlsBarriers', db, tailboard)
-                                                    , title=tailboardID,
-                                                    firstName=users['firstName'], lastName=users['lastName'],
-                                                    token=confirm_url,
-                                                    page=tailboardID))
+def new_tailboard_email(tailboardID):
+    tailboard = Tailboard.query.join(Tailboard_Users).join(User).filter((Tailboard_Users.tailboard_id == tailboardID) & (Tailboard_Users.sign_on_time == None)).first()
+    users = User.query.join(Tailboard_Users).join(Tailboard).filter((Tailboard_Users.tailboard_id == tailboardID)).all()
+    for x in users:
+        print(x)
+        send_email('[Deimos] Tailboard - ID:' + str(tailboard.id),
+                   sender=app.config['ADMINS'][0],
+                   recipients=[x.email],
+                   text_body=render_template('email/archive_output_email.txt'),
+                   html_body=render_template('email/archive_output_email.html', tailboard=tailboard,
+                           presentUserData = Tailboard_Users.query.join(User).filter((Tailboard_Users.tailboard_id == tailboardID)).all(),
+                           presentVehiclesData = Vehicle.query.filter(Vehicle.tailboard.any(id=tailboardID)).all(),
+                           presentDangerDic = Dangers.query.filter(Dangers.tailboard.any(id=tailboardID)).all(),
+                           controlsBarriersDic = Barriers.query.filter(Barriers.tailboard.any(id=tailboardID)).all(),
+                           voltageDic = Voltages.query.filter(Voltages.tailboard.any(id=tailboardID)).all(),
+                           timeStamp = datetime(year=1970,month=1,day=1,hour=0,minute=0,second=0,microsecond=0))
+                   )
 
 
 # Function: sendReportToManager
@@ -156,3 +142,11 @@ def managers_email_initiate():
             atexit.register(lambda: scheduler.shutdown())
     except FileNotFoundError:
         return None
+
+def send_password_reset_email(user):
+    token = user.get_reset_password_token()
+    send_email('[Deimos] Reset Your Password',
+               sender=app.config['ADMINS'][0],
+               recipients=[user.email],
+               text_body=render_template('email/reset_password.txt', user=user, token=token),
+               html_body=render_template('email/reset_password.html', user=user, token=token))

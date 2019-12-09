@@ -4,8 +4,11 @@
     {% else %}
         <title>Deimos</title>
 {% endif %}
-<link rel="stylesheet" href="static/css/paper.css">
 
+{{ moment.include_jquery() }}
+{{ moment.include_moment() }}
+
+<link rel="stylesheet" href="static/css/paper.css">
 <!-- Set page size here: A5, A4 or A3 -->
 <!-- Set also "landscape" if you need -->
 <style>@page { size: A5 }</style>
@@ -19,12 +22,11 @@
     <center><h1>Tailboard Report</h1></center>
     <table style="width: 100%">
         <tr>
-            <td><p><strong>Date: </strong><i> {{ tailboard.timestamp }}</i></p></td>
+		<td><p><strong>Date: </strong><i>{{moment( tailboard.timestamp).format('LLLL') }}</i></p></td>
             <td><p><strong>Job ID:</strong><i> {{ tailboard.id }}</i></p></td>
             <td><p><strong>Job Location:</strong><i> {{ tailboard.location }}</i></p></td>
         </tr>
     </table>
-
     <style type="text/css">
     .tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;width: 100%}
     .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;border-top-width:1px;border-bottom-width:1px;}
@@ -33,14 +35,28 @@
     </style>
     <table class="tg">
         <tr>
-            <th class="tg-hgcj" colspan="4">Staff Present<br></th>
+            <th class="tg-hgcj" colspan="5">Staff Present<br></th>
         </tr>
         {% for o in presentUserData %}
         <tr>
-            <td class="tg-031e">{{ o.firstName }} {{ o.lastName }}</td>
-            <td class="tg-031e">{{ o.email }}</td>
-            <td class="tg-031e">{{ o.corporateID }}</td>
-            <td class="tg-031e" style="width: 5%">{% if o.present -%}&#10003; {%  endif %}</td>
+            <td class="tg-031e">{{ o.user.firstName }} {{ o.user.lastName }}</td>
+            <td class="tg-031e">{{ o.user.email }}</td>
+            <td class="tg-031e">{{ o.user.corporateID }}</td>
+            <td class="tg-031e" style="width: 5%">
+            {% if o.sign_on_time is not none %}
+	    {% if o.sign_on_time > timeStamp %}
+				&#10003;
+		{% elif o.sign_on_time ==  timeStamp %}
+	                	&#10005;
+
+                {%  endif %}
+            {%  endif %}
+        </td>
+	<td class="tg-031e" style="width: 5%">
+            {% if o.sign_off_time is not none %}
+                &#10003;
+            {%  endif %}
+            </td>
         </tr>
         {% endfor %}
     </table>
@@ -115,3 +131,5 @@
 </section>
 
 </body>
+
+

@@ -7,8 +7,9 @@ from flask import render_template, request, redirect, flash, send_from_directory
 from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db
 from app.models import User, Vehicle, Dangers, Barriers, Tailboard, Voltages, Tailboard_Users
-from .email import newTailboardEmail, managers_email_initiate
+#from .email import newTailboardEmail, managers_email_initiatei
 from .token import confirm_token
+from app.email import send_password_reset_email, new_tailboard_email
 
 path_d = ["project/dynamic/xlsx"]
 
@@ -22,7 +23,6 @@ def activate_job():
             print("Creation of the directory %s failed" % path)
         else:
             print("Successfully created the directory %s" % path)
-    managers_email_initiate()
 
 @app.before_request
 def before_request():
@@ -109,6 +109,7 @@ def newTailboard():
             tailboard.add_voltage(voltage_to_add)
         db.session.add(tailboard)
         db.session.commit()
+        new_tailboard_email(tailboard.id)
         return redirect('/')
     return render_template('newTailboard.html', staff=user,
                            vehicle=vehicle,presentDangers=presentDangers,controlsBarriers=controlBarriers,
@@ -280,18 +281,47 @@ def archives():
 
 @app.route('/handleArchives/<tailboardID>')
 def handleArchives(tailboardID):
-    tailboard_current = Tailboard.query.filter_by(id=tailboardID).first()
+    tailboard_current = Tailboard.query.filter_by(id=tailboardID).first() 
+
     return render_template('archiveOutput.html', tailboard=tailboard_current,
-                           presentUserData = User.query.filter(User.tailboard.any(id=tailboardID)).all(),
+                           presentUserData = Tailboard_Users.query.join(User).filter((Tailboard_Users.tailboard_id == tailboardID)).all(),
                            presentVehiclesData = Vehicle.query.filter(Vehicle.tailboard.any(id=tailboardID)).all(),
                            presentDangerDic = Dangers.query.filter(Dangers.tailboard.any(id=tailboardID)).all(),
                            controlsBarriersDic = Barriers.query.filter(Barriers.tailboard.any(id=tailboardID)).all(),
-                           voltageDic = Voltages.query.filter(Voltages.tailboard.any(id=tailboardID)).all())
+                           voltageDic = Voltages.query.filter(Voltages.tailboard.any(id=tailboardID)).all(),
+                           timeStamp = datetime(year=1970,month=1,day=1,hour=0,minute=0,second=0,microsecond=0))
 
 @app.route('/about')
 def about():
     return render_template('about.html',
                            title='about', page='about')
+
+@app.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    if request.method == 'POST':
+        user = User.query.filter_by(email=request.form['inputEmail']).first()
+        if user:
+            send_password_reset_email(user)
+        flash('Check your email for the instructions to reset your password')
+        return redirect(url_for('login'))
+    return render_template('reset_password_request.html',
+                           title='Reset Password')
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.verify_reset_password_token(token)
+    if not user:
+        return redirect(url_for('index'))
+    if request.method == 'POST':
+        user.set_password(request.form['password'])
+        db.session.commit()
+        print('Your password has been reset.')
+        return redirect(url_for('login'))
+    return render_template('reset_password.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

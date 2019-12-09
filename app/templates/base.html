@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-   
+    {{ moment.include_jquery() }}
+    {{ moment.include_moment() }}
     {% if title %}
         <title>{{ title }} - Deimos</title>
     {% else %}

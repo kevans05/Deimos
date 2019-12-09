@@ -1,8 +1,11 @@
-from app import db
+from app import db, app
 from app import login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from datetime import datetime
+from time import time
+
+import jwt
 
 vehicle_association_table = db.Table(
     'vehicle_association_table',
@@ -30,12 +33,6 @@ voltage_association_table = db.Table(
     db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id'))
 )
 
-
-users_association_table = db.Table(
-     'users_association_table',
-     db.Column('User_id', db.Integer, db.ForeignKey('user.id')),
-     db.Column('Tailboard_id', db.Integer, db.ForeignKey('tailboard.id'))
-)
 
 class Tailboard_Users(db.Model): 
     id = db.Column(db.Integer, primary_key=True)
@@ -91,9 +88,6 @@ class Tailboard(db.Model):
     tailboard_barriers = db.relationship('Barriers', secondary=barriers_association_table,
                             backref=db.backref('tailboard', lazy='dynamic'))
 
-    tailboard_users = db.relationship('User', secondary=users_association_table,
-                            backref=db.backref('tailboard',lazy='dynamic'))
-
     tailboard_voltage = db.relationship('Voltages', secondary=voltage_association_table,
                             backref=db.backref('tailboard', lazy='dynamic'))
 
@@ -117,10 +111,9 @@ class Tailboard(db.Model):
         self.tailboard_voltage.append(voltage)
 
     def add_user(self, user):
-        self.tailboard_users.append(user)
-        x = Tailboard_Users(tailboard_id=self.id, user_id=user.id)
-        self.tailboard_user.append(x)
-        user.user_tailboard.append(x)
+        tailboard_users = Tailboard_Users(tailboard_id=self.id, user_id=user.id)
+        self.tailboard_user.append(tailboard_users)
+        user.user_tailboard.append(tailboard_users)
 
 
 class User(UserMixin, db.Model):
@@ -146,6 +139,19 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def get_reset_password_token(self, expires_in=600):
+                return jwt.encode(
+                    {'reset_password': self.id, 'exp': time() + expires_in},
+                    app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                    algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.get(id)
 
 @login.user_loader
 def load_user(id):
