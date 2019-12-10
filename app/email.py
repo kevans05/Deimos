@@ -15,8 +15,6 @@ import json
 from app import app
 from app.models import User, Vehicle, Dangers, Barriers, Tailboard, Voltages, Tailboard_Users
 from .token import generate_confirmation_token
-from .basicModules import parse_a_database_return_a_list_users, parse_a_database_return_a_list
-
 
 def send_async_email(app, msg):
     with app.app_context():
@@ -57,19 +55,55 @@ def new_tailboard_email(tailboardID):
     tailboard = Tailboard.query.join(Tailboard_Users).join(User).filter((Tailboard_Users.tailboard_id == tailboardID) & (Tailboard_Users.sign_on_time == None)).first()
     users = User.query.join(Tailboard_Users).join(Tailboard).filter((Tailboard_Users.tailboard_id == tailboardID)).all()
     for x in users:
-        print(x)
+        tailboard_user = Tailboard_Users.query.filter((Tailboard_Users.user_id == x.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
         send_email('[Deimos] Tailboard - ID:' + str(tailboard.id),
                    sender=app.config['ADMINS'][0],
                    recipients=[x.email],
-                   text_body=render_template('email/archive_output_email.txt'),
+                   text_body=render_template('email/archive_output_email.txt', tailboard=tailboard,
+                           presentUserData = Tailboard_Users.query.join(User).filter((Tailboard_Users.tailboard_id == tailboardID)).all(),
+                           presentVehiclesData = Vehicle.query.filter(Vehicle.tailboard.any(id=tailboardID)).all(),
+                           presentDangerDic = Dangers.query.filter(Dangers.tailboard.any(id=tailboardID)).all(),
+                           controlsBarriersDic = Barriers.query.filter(Barriers.tailboard.any(id=tailboardID)).all(),
+                           voltageDic = Voltages.query.filter(Voltages.tailboard.any(id=tailboardID)).all(),
+                           acceptToken = tailboard_user.get_accept_tailboard_token(),
+                           rejectToken = tailboard_user.get_refuse_tailboard_token(),
+                           timeStamp = datetime(year=1970,month=1,day=1,hour=0,minute=0,second=0,microsecond=0)),
                    html_body=render_template('email/archive_output_email.html', tailboard=tailboard,
                            presentUserData = Tailboard_Users.query.join(User).filter((Tailboard_Users.tailboard_id == tailboardID)).all(),
                            presentVehiclesData = Vehicle.query.filter(Vehicle.tailboard.any(id=tailboardID)).all(),
                            presentDangerDic = Dangers.query.filter(Dangers.tailboard.any(id=tailboardID)).all(),
                            controlsBarriersDic = Barriers.query.filter(Barriers.tailboard.any(id=tailboardID)).all(),
                            voltageDic = Voltages.query.filter(Voltages.tailboard.any(id=tailboardID)).all(),
+                           acceptToken = tailboard_user.get_accept_tailboard_token(),
+                           rejectToken = tailboard_user.get_refuse_tailboard_token(),
                            timeStamp = datetime(year=1970,month=1,day=1,hour=0,minute=0,second=0,microsecond=0))
                    )
+
+
+def sign_off_email(tailboardID):
+    send_email('[Deimos] Sign off Tailboard - ID:' + str(tailboard.id),
+                   sender=app.config['ADMINS'][0],
+                   recipients=[x.email],
+                   text_body=render_template('email/archive_output_email.txt', tailboard=tailboard,
+                           presentUserData = Tailboard_Users.query.join(User).filter((Tailboard_Users.tailboard_id == tailboardID)).all(),
+                           presentVehiclesData = Vehicle.query.filter(Vehicle.tailboard.any(id=tailboardID)).all(),
+                           presentDangerDic = Dangers.query.filter(Dangers.tailboard.any(id=tailboardID)).all(),
+                           controlsBarriersDic = Barriers.query.filter(Barriers.tailboard.any(id=tailboardID)).all(),
+                           voltageDic = Voltages.query.filter(Voltages.tailboard.any(id=tailboardID)).all(),
+                           acceptToken = tailboard_user.get_accept_tailboard_token(),
+                           rejectToken = tailboard_user.get_refuse_tailboard_token(),
+                           timeStamp = datetime(year=1970,month=1,day=1,hour=0,minute=0,second=0,microsecond=0)),
+                   html_body=render_template('email/archive_output_email.html', tailboard=tailboard,
+                           presentUserData = Tailboard_Users.query.join(User).filter((Tailboard_Users.tailboard_id == tailboardID)).all(),
+                           presentVehiclesData = Vehicle.query.filter(Vehicle.tailboard.any(id=tailboardID)).all(),
+                           presentDangerDic = Dangers.query.filter(Dangers.tailboard.any(id=tailboardID)).all(),
+                           controlsBarriersDic = Barriers.query.filter(Barriers.tailboard.any(id=tailboardID)).all(),
+                           voltageDic = Voltages.query.filter(Voltages.tailboard.any(id=tailboardID)).all(),
+                           acceptToken = tailboard_user.get_accept_tailboard_token(),
+                           rejectToken = tailboard_user.get_refuse_tailboard_token(),
+                           timeStamp = datetime(year=1970,month=1,day=1,hour=0,minute=0,second=0,microsecond=0))
+                   )
+
 
 
 # Function: sendReportToManager
@@ -80,39 +114,9 @@ def new_tailboard_email(tailboardID):
 #       0
 #   DESCRIPTION:
 #       finds all the tailboards that have taken place in the last 24 hours, find all the suppervisors and generate an email
-def send_report_to_manager():
-    import flask
-    dictionaryOfSupervisorsandAssosiatedTailboard = {}
-    list_of_tailboards = []
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    twentyFourHoursAgo = datetime.now() - timedelta(days=1)
-
-    allReportsFromLastTwentyFourHours = db['tailboard'].find(db['tailboard'].table.columns.jobDate > twentyFourHoursAgo)
-    for currentTailboard in allReportsFromLastTwentyFourHours:
-
-        for users in currentTailboard['presentStaff']:
-            if users is not ';':
-                x = (db['staff'].find_one(id=users))
-                if x['supervisorEmail'] in dictionaryOfSupervisorsandAssosiatedTailboard.keys():
-                    y = dictionaryOfSupervisorsandAssosiatedTailboard[x['supervisorEmail']]
-                    y.append(currentTailboard['jobID'])
-                    dictionaryOfSupervisorsandAssosiatedTailboard[x['supervisorEmail']] = y
-                else:
-                    dictionaryOfSupervisorsandAssosiatedTailboard[x['supervisorEmail']] = [currentTailboard['jobID']]
-    for key, values in dictionaryOfSupervisorsandAssosiatedTailboard.items():
-        supervisor_email = key
-        dictionary_of_tailboard = {}
-        for tailboard in values:
-            dictionary_of_tailboard = {'tailboard':tailboard,'users':parse_a_database_return_a_list_users(db, db['tailboard'].find_one(jobID=tailboard))}
-            list_of_tailboards.append(dictionary_of_tailboard)
-        print(supervisor_email)
-        print(list_of_tailboards)
-        x =  render_template('hello.html', name="bill")
-        #sendEmail("Your team has been included on Tailboards from: %s - %s" % (twentyFourHoursAgo, datetime.now()),
-                  #"evansk@londonhydro.com",[supervisor_email],"XX")
-
-
-
+def send_report_to_manager(tailboardID):
+    tailboard = Tailboard.query.join(Tailboard_Users).join(User).filter(
+        (Tailboard_Users.tailboard_id == tailboardID) & (Tailboard_Users.sign_on_time == None)).first()
 
 
 # Function: managersEmailInitiate

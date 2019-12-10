@@ -1,0 +1,9 @@
+Dear {{user.email }},
+
+    You accepted Tailboard {{ tailboard.id }}. Please sign off by clicking the following link, when you are done your work:
+    {{ url_for('sign_off_email', token=token, _external=True) }}
+
+    Click bellow to view the tailboard:
+    {{ url_for('handleArchives',tailboardID=tailboard.id, _external=True) }}
+
+The System Admin Elves

@@ -1,0 +1,54 @@
+lboard Report
+Date: {{ tailboard.timestamp }}
+Job ID: {{ tailboard.id }}
+Job Location: {{ tailboard.location }}
+--------------------------------------------
+Staff Present
+{% for o in presentUserData %}
+    {{ o.firstName }} {{ o.lastName }}-{{ o.email }}-{{ o.corporateID }}-{% if o.present -%}&#10003; {%  endif %}
+{% endfor %}
+
+--------------------------------------------
+Vehicles Present
+{% for o in presentVehiclesData %}
+    {{ o.corporationID }}-{{ o.make }} {{ o.model }}
+{% endfor %}
+
+--------------------------------------------
+Voltage Present
+{% for o in voltageDic %}
+    Phase Voltage {{ o.voltage }}-Phases {{ o. numberOfPhases }}-Wires{{ o.numberOfWires }}
+{% endfor %}
+--------------------------------------------
+Present Dangers Present
+{% for o in presentDangerDic %}
+    {{ o.danger }}
+{% endfor %}
+ 
+--------------------------------------------
+Controls/Barriers Present
+{% for o in controlsBarriersDic %}
+    {{ o.controlsBarriers }}
+{% endfor %}
+
+--------------------------------------------
+Job Steps
+{{ tailboard.jobSteps }}
+
+--------------------------------------------
+Hazards
+{{ tailboard.hazards }}
+
+--------------------------------------------
+Protections
+{{ tailboard.barrriersMitigation }}
+
+--------------------------------------------
+
+The following link accepts the information on the tailboard and attaches you to the tailboard
+
+{{ url_for('joinTailboardEmail', token=acceptToken, _external=True) }}
+
+The following link rejects the information on the tailboard and will remove you from the tailboard 
+
+{{ url_for('refuseTailboardEmail', token=rejectToken, _external=True) }}

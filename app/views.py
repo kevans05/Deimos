@@ -7,11 +7,12 @@ from flask import render_template, request, redirect, flash, send_from_directory
 from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db
 from app.models import User, Vehicle, Dangers, Barriers, Tailboard, Voltages, Tailboard_Users
-#from .email import newTailboardEmail, managers_email_initiatei
+# from .email import newTailboardEmail, managers_email_initiatei
 from .token import confirm_token
-from app.email import send_password_reset_email, new_tailboard_email
+from app.email import send_password_reset_email, new_tailboard_email, sign_off_email
 
 path_d = ["project/dynamic/xlsx"]
+
 
 @app.before_first_request
 def activate_job():
@@ -24,11 +25,13 @@ def activate_job():
         else:
             print("Successfully created the directory %s" % path)
 
+
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
+
 
 @app.after_request
 def per_request_callbacks(response):
@@ -41,55 +44,89 @@ def per_request_callbacks(response):
             os.remove(os.path.join(mydir, f))
     return response
 
+
 @app.route('/')
 @app.route('/index')
 def index():
     if current_user.is_authenticated:
-        myTailboards = Tailboard.query.join(Tailboard_Users).join(User).filter((Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.sign_on_time == None) ).all()
+        myTailboards = Tailboard.query.join(Tailboard_Users).join(User).filter(
+            (Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.sign_on_time == None)).all()
 
-        workingTailboards = Tailboard.query.join(Tailboard_Users).join(User).filter((Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.sign_on_time > datetime(year=1971,month=1,day=1,hour=0,minute=0,second=0,microsecond=0)) & (Tailboard_Users.sign_off_time == None)).all()
+        workingTailboards = Tailboard.query.join(Tailboard_Users).join(User).filter(
+            (Tailboard_Users.user_id == current_user.id) & (
+                        Tailboard_Users.sign_on_time > datetime(year=1971, month=1, day=1, hour=0, minute=0, second=0,
+                                                                microsecond=0)) & (
+                        Tailboard_Users.sign_off_time == None)).all()
 
         return render_template('index.html',
-                title='Current Tailboards',myTailboards=myTailboards, workingTailboards=workingTailboards)
+                               title='Current Tailboards', myTailboards=myTailboards,
+                               workingTailboards=workingTailboards)
     else:
         return render_template('index.html',
-                           title='Home')
+                               title='Home')
+
 
 @app.route('/signOffTailboard/<tailboardID>')
 def signOffTailboard(tailboardID):
-    tailboardToJoin = Tailboard_Users.query.filter((Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
+    tailboardToJoin = Tailboard_Users.query.filter(
+        (Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
     tailboardToJoin.sign_off_time = datetime.utcnow()
-    db.session.commit() 
+    db.session.commit()
+    return redirect('/')
+
+@app.route('/signOffTailboardEmail/<token>', methods=['GET', 'POST'])
+def signOffTailboardEmail(token):
+    tailboard_user = Tailboard_Users.verify_refuse_tailboard_token(token)
+    tailboard_user.sign_off_time = datetime.utcnow()
+    db.session.commit()
     return redirect('/')
 
 @app.route('/joinTailboard/<tailboardID>')
 def joinTailboard(tailboardID):
-    tailboardToJoin = Tailboard_Users.query.filter((Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
+    tailboardToJoin = Tailboard_Users.query.filter(
+        (Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
     tailboardToJoin.sign_on_time = datetime.utcnow()
-    db.session.commit() 
+    db.session.commit()
+    sign_off_email(tailboardToJoin.id)
     return redirect('/')
 
 
-@app.route('/refuesTailboard/<tailboardID>')
-def refuseTailboard(tailboardID):    
-    tailboardToJoin = Tailboard_Users.query.filter((Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
-    tailboardToJoin.sign_on_time = datetime(year=1970,month=1,day=1,hour=0,minute=0,second=0,microsecond=0)
+@app.route('/joinTailboardEmail/<token>', methods=['GET', 'POST'])
+def joinTailboardEmail(token):
+    tailboard_user = Tailboard_Users.verify_join_tailboard_token(token)
+    tailboard_user.sign_on_time = datetime.utcnow()
+    db.session.commit()
+    tailboard_user(tailboardToJoin.id)
+    return redirect('/')
+
+@app.route('/refuseTailboard/<tailboardID>')
+def refuseTailboard(tailboardID):
+    tailboardToJoin = Tailboard_Users.query.filter(
+        (Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
+    tailboardToJoin.sign_on_time = datetime(year=1970, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    db.session.commit()
+    return redirect('/')
+
+@app.route('/refuseTailboardEmail/<token>', methods=['GET', 'POST'])
+def refuseTailboardEmail(token):
+    tailboard_user = Tailboard_Users.verify_refuse_tailboard_token(token)
+    tailboard_user.sign_on_time = datetime(year=1970, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
     db.session.commit()
     return redirect('/')
 
 
-@app.route('/newTailboard', methods=['GET','POST'])
+@app.route('/newTailboard', methods=['GET', 'POST'])
 @login_required
 def newTailboard():
-    controlBarriers= Barriers.query.all()
+    controlBarriers = Barriers.query.all()
     presentDangers = Dangers.query.all()
     vehicle = Vehicle.query.all()
     user = User.query.all()
     voltages = Voltages.query.all()
     if request.method == 'POST':
-               
-        tailboard = Tailboard(timestamp = datetime.utcnow(),location = request.form['location'],
-                              jobSteps = request.form['jobSteps'], jobHazards = request.form['hazards'],
+
+        tailboard = Tailboard(timestamp=datetime.utcnow(), location=request.form['location'],
+                              jobSteps=request.form['jobSteps'], jobHazards=request.form['hazards'],
                               jobProtectios=request.form['barrriersMitigation'])
 
         for i in request.form.getlist("vehicle"):
@@ -112,7 +149,7 @@ def newTailboard():
         new_tailboard_email(tailboard.id)
         return redirect('/')
     return render_template('newTailboard.html', staff=user,
-                           vehicle=vehicle,presentDangers=presentDangers,controlsBarriers=controlBarriers,
+                           vehicle=vehicle, presentDangers=presentDangers, controlsBarriers=controlBarriers,
                            voltage=voltages)
 
 
@@ -133,34 +170,36 @@ def handleTailboardEmail(token):
     tailboardData.update(data, ['jobID'])
     return redirect('/')
 
-@app.route('/newVehicle', methods=['GET','POST'])
+
+@app.route('/newVehicle', methods=['GET', 'POST'])
 def newVehicle():
     if request.method == 'POST':
         vehicle = Vehicle(nickname=request.form['inputNickname'],
-                corporationID=request.form['inputCorporationID'], make=request.form['inputMake'],
-                model=request.form['inputModel'],enabled=True)
+                          corporationID=request.form['inputCorporationID'], make=request.form['inputMake'],
+                          model=request.form['inputModel'], enabled=True)
         db.session.add(vehicle)
         db.session.commit()
         return redirect('newVehicle')
     return render_template('vehicleNew.html',
                            title='New Vehicle')
 
-@app.route('/editVehicle', methods=['GET','POST'])
+
+@app.route('/editVehicle', methods=['GET', 'POST'])
 def editVehicle():
     vehicle = Vehicle.query.all()
     if request.method == 'POST':
         target_vehicle = Vehicle.query.filter_by(id=request.form['inputid']).first()
-        target_vehicle.nickname=request.form['inputNickname']
-        target_vehicle.corporationID=request.form['inputCorporationID']
-        target_vehicle.make=request.form['inputMake']
-        target_vehicle.model=request.form['inputModel']
+        target_vehicle.nickname = request.form['inputNickname']
+        target_vehicle.corporationID = request.form['inputCorporationID']
+        target_vehicle.make = request.form['inputMake']
+        target_vehicle.model = request.form['inputModel']
         db.session.commit()
         return redirect('/')
     return render_template('vehicleEdit.html',
                            title='Edit Vehicle', vehicle=vehicle)
 
 
-@app.route('/newPresentDangers', methods=['GET','POST'])
+@app.route('/newPresentDangers', methods=['GET', 'POST'])
 def newPresentDangers():
     if request.method == 'POST':
         presentDangers = Dangers(dangers=request.form['newPresentDanger'], enabled=True)
@@ -170,18 +209,20 @@ def newPresentDangers():
     return render_template('presentDangersNew.html',
                            title='New Present Dangers')
 
-@app.route('/editPresentDangers', methods=['GET','POST'])
+
+@app.route('/editPresentDangers', methods=['GET', 'POST'])
 def editPresentDangers():
     presentDangers = Dangers.query.all()
     if request.method == 'POST':
         target_presentDangers = Dangers.query.filter_by(id=request.form['inputid']).first()
-        target_presentDangers.dangers=request.form['inputDangers']
+        target_presentDangers.dangers = request.form['inputDangers']
         db.session.commit()
         return redirect('/')
     return render_template('presentDangersEdit.html',
                            title='Present Danger', presentDangers=presentDangers)
 
-@app.route('/newControlBarriers', methods=['GET','POST'])
+
+@app.route('/newControlBarriers', methods=['GET', 'POST'])
 def newControlBarriers():
     if request.method == 'POST':
         barrier = Barriers(controlBarriers=request.form['newControlBarriers'], enabled=True)
@@ -191,21 +232,23 @@ def newControlBarriers():
     return render_template('controlsBarriersNew.html',
                            title='New Present Dangers')
 
-@app.route('/editControlBarriers', methods=['GET','POST'])
+
+@app.route('/editControlBarriers', methods=['GET', 'POST'])
 def editControlBarriers():
-    controlBarriers= Barriers.query.all()
+    controlBarriers = Barriers.query.all()
     if request.method == 'POST':
         target_control_barrier = Barriers.query.filter_by(id=request.form['inputid']).first()
-        target_control_barrier.controlBarriers=request.form['controlOrBarriers']
+        target_control_barrier.controlBarriers = request.form['controlOrBarriers']
         db.session.commit()
         return redirect('/')
     return render_template('controlsBarriersEdit.html',
-                           title='Present Danger',controlBarriers=controlBarriers)
+                           title='Present Danger', controlBarriers=controlBarriers)
 
-@app.route('/newVoltages', methods=['GET','POST'])
+
+@app.route('/newVoltages', methods=['GET', 'POST'])
 def newVoltages():
     if request.method == 'POST':
-        voltages = Voltages(voltage=request.form['newVoltage'],numberOfWires=request.form['numberOfWires'],
+        voltages = Voltages(voltage=request.form['newVoltage'], numberOfWires=request.form['numberOfWires'],
                             numberOfPhases=request.form['numberOfPhases'], enabled=True)
         db.session.add(voltages)
         db.session.commit()
@@ -213,7 +256,8 @@ def newVoltages():
     return render_template('voltageNew.html',
                            title='New Voltage')
 
-@app.route('/editVoltages', methods=['GET','POST'])
+
+@app.route('/editVoltages', methods=['GET', 'POST'])
 def editVoltages():
     voltages = Voltages.query.all()
     if request.method == 'POST':
@@ -224,14 +268,16 @@ def editVoltages():
         db.session.commit()
         return redirect('/')
     return render_template('voltageEdit.html',
-                           title='Voltages',voltage=voltages)
+                           title='Voltages', voltage=voltages)
+
 
 @app.route('/emailSettings')
 def emailSettings():
     return render_template('emailSettings.html',
                            title='Edit Settings')
 
-@app.route('/handleEmailSettings' , methods=['POST'])
+
+@app.route('/handleEmailSettings', methods=['POST'])
 def handleEmailSettings():
     if request.method == 'POST':
         admin = "['" + request.form['admin_email'] + "']"
@@ -244,11 +290,11 @@ def handleEmailSettings():
         else:
             mail_uses_ssl = False
 
-        data = {'mailServer':request.form['mailServer'], 'mailPort':request.form['mailPort'],
-                          'mailUseTLS':mail_uses_tls, 'mailUseSSL':mail_uses_ssl,
-                          'username':request.form['username'], 'password':request.form['password'], 'admin':admin}
-        with open('project/dynamic/db/email_server_settings.txt','w') as outfile:
-            json.dump(data,outfile)
+        data = {'mailServer': request.form['mailServer'], 'mailPort': request.form['mailPort'],
+                'mailUseTLS': mail_uses_tls, 'mailUseSSL': mail_uses_ssl,
+                'username': request.form['username'], 'password': request.form['password'], 'admin': admin}
+        with open('project/dynamic/db/email_server_settings.txt', 'w') as outfile:
+            json.dump(data, outfile)
     return redirect('/')
 
 
@@ -263,13 +309,16 @@ def reminderSettings():
     return render_template('reminderSettings.html',
                            title='Admin Settings')
 
-@app.route('/handleReminderSettings' , methods=['POST'])
+
+@app.route('/handleReminderSettings', methods=['POST'])
 def handleReminderSettings():
     if request.method == 'POST':
-        data = {'mail_server_time': request.form['mailServerTime'], 'health_and_safety_email': request.form['healthAndSafetyEmail']}
+        data = {'mail_server_time': request.form['mailServerTime'],
+                'health_and_safety_email': request.form['healthAndSafetyEmail']}
         with open('project/dynamic/db/reminder_settings.txt', 'w') as outfile:
             json.dump(data, outfile)
     return redirect('/')
+
 
 @app.route('/archives')
 def archives():
@@ -281,20 +330,23 @@ def archives():
 
 @app.route('/handleArchives/<tailboardID>')
 def handleArchives(tailboardID):
-    tailboard_current = Tailboard.query.filter_by(id=tailboardID).first() 
+    tailboard_current = Tailboard.query.filter_by(id=tailboardID).first()
 
     return render_template('archiveOutput.html', tailboard=tailboard_current,
-                           presentUserData = Tailboard_Users.query.join(User).filter((Tailboard_Users.tailboard_id == tailboardID)).all(),
-                           presentVehiclesData = Vehicle.query.filter(Vehicle.tailboard.any(id=tailboardID)).all(),
-                           presentDangerDic = Dangers.query.filter(Dangers.tailboard.any(id=tailboardID)).all(),
-                           controlsBarriersDic = Barriers.query.filter(Barriers.tailboard.any(id=tailboardID)).all(),
-                           voltageDic = Voltages.query.filter(Voltages.tailboard.any(id=tailboardID)).all(),
-                           timeStamp = datetime(year=1970,month=1,day=1,hour=0,minute=0,second=0,microsecond=0))
+                           presentUserData=Tailboard_Users.query.join(User).filter(
+                               (Tailboard_Users.tailboard_id == tailboardID)).all(),
+                           presentVehiclesData=Vehicle.query.filter(Vehicle.tailboard.any(id=tailboardID)).all(),
+                           presentDangerDic=Dangers.query.filter(Dangers.tailboard.any(id=tailboardID)).all(),
+                           controlsBarriersDic=Barriers.query.filter(Barriers.tailboard.any(id=tailboardID)).all(),
+                           voltageDic=Voltages.query.filter(Voltages.tailboard.any(id=tailboardID)).all(),
+                           timeStamp=datetime(year=1970, month=1, day=1, hour=0, minute=0, second=0, microsecond=0))
+
 
 @app.route('/about')
 def about():
     return render_template('about.html',
                            title='about', page='about')
+
 
 @app.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
@@ -308,6 +360,7 @@ def reset_password_request():
         return redirect(url_for('login'))
     return render_template('reset_password_request.html',
                            title='Reset Password')
+
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
@@ -323,11 +376,12 @@ def reset_password(token):
         return redirect(url_for('login'))
     return render_template('reset_password.html')
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-  
+
     if request.method == 'POST':
         user = User.query.filter_by(email=request.form['inputEmail']).first()
         if user is None or not user.check_password(request.form['inputPassword']):
@@ -339,14 +393,15 @@ def login():
         return redirect(next_page)
     return render_template('login.html', title='Sign In')
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     if request.method == 'POST':
-        user = User(firstName=request.form['inputFirstName'],lastName=request.form['inputLastName'],
+        user = User(firstName=request.form['inputFirstName'], lastName=request.form['inputLastName'],
                     corporateID=request.form['inputCorpID'], email=request.form['inputEmail'],
-                    tel=request.form['inputPhoneNumber'],supervisorEmail=request.form['supervisorEmail'],
+                    tel=request.form['inputPhoneNumber'], supervisorEmail=request.form['supervisorEmail'],
                     enabled=True)
         user.set_password(request.form['password'])
         db.session.add(user)
@@ -354,10 +409,12 @@ def register():
         return redirect('login')
     return render_template('register.html', title='Register')
 
+
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
 
 @app.route('/exportDataBase.xlsx')
 def exportDataBase():
@@ -368,7 +425,3 @@ def exportDataBase():
     tailboards = Tailboard.query.all()
 
     return redirect(url_for('index'))
-
-
-
-

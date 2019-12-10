@@ -1,0 +1,107 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+{% if title %}
+    <title>{{ title }} - Deimos</title>
+{% else %}
+    <title>Deimos</title>
+{% endif %}
+<body>
+<!-- Write HTML just like a web page -->
+<h1>Tailboard Report</h1>
+<hr>
+<p><strong>Date: </strong><i> {{ tailboard.timestamp }}</i></p>
+<p><strong>Job ID:</strong><i> {{ tailboard.id }}</i></p>
+<p><strong>Job Location:</strong><i> {{ tailboard.location }}</i></p>
+<hr>
+<p><strong>Staff Present</strong></p>
+
+<table class="tg">
+    {% for o in presentUserData %}
+    <tr>
+        <td class="tg-031e">{{ o.user.firstName }} {{ o.user.lastName }}</td>
+        <td class="tg-031e">{{ o.user.email }}</td>
+        <td class="tg-031e">{{ o.user.corporateID }}</td>
+        <td class="tg-031e" style="width: 5%">
+        {% if o.sign_on_time is not none %}
+    {% if o.sign_on_time > timeStamp %}
+            &#10003;
+    {% elif o.sign_on_time ==  timeStamp %}
+                    &#10005;
+
+            {%  endif %}
+        {%  endif %}
+    </td>
+        <td class="tg-031e" style="width: 5%">
+            {% if o.sign_off_time is not none %}
+                &#10003;
+            {%  endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<hr>
+<p><strong>Vehicles Present</strong></p>
+<table>
+    {% for o in presentVehiclesData %}
+        <tr>
+            <td style="width: 25%">{{ o.corporationID }}</td>
+            <td style="width: 45%">{{ o.make }} {{ o.model }}</td>
+            <td style="width: 25%"><i>AED Present:</i></td>
+            <td style="width: 5%">{% if o.AED -%}&#10003; {% endif %}</td>
+        </tr>
+    {% endfor %}
+</table>
+<hr>
+<p><strong>Voltage Present</strong></p>
+<table>
+       {% for o in voltageDic %}
+        <tr>
+            <td style="width: 40%">Phase Voltage:{{ o.voltage }}</td>
+            <td style="width: 30%">Phases: {{ o.numberOfPhases }}</td>
+            <td style="width: 30%">Wires: {{ o.numberOfWires }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+<hr>
+<p><strong>Present Dangers Present</strong></p>
+<table>
+   {% for o in presentDangerDic %}
+        <tr>
+            <td class="tg-031e">{{ o.dangers }}</td>
+        </tr>
+    {% endfor %}
+</table>
+<hr>
+<p><strong>Controls/Barriers Present</strong></p>
+<table>
+    {% for o in controlsBarriersDic %}
+        <tr>
+            <td class="tg-031e">{{ o.controlBarriers }}</td>
+        </tr>
+    {% endfor %}
+</table>
+<hr>
+<h3>Job Steps:</h3>
+<p>
+    {{ tailboard.jobSteps }}
+</p>
+<hr>
+<h3>Hazards:</h3>
+<p>
+    {{ tailboard.hazards }}
+</p>
+<hr>
+<h3>Protections:</h3>
+<p>
+    {{ tailboard.barrriersMitigation }}
+</p>
+<hr>
+<p>The following link accepts the information on the tailboard and attaches you to the tailboard</p>
+
+<h3>{{ url_for('joinTailboardEmail', token=acceptToken, _external=True) }}</h3>
+
+<p>The following link rejects the information on the tailboard and will remove you from the tailboard </p>
+
+<h3>{{ url_for('refuseTailboardEmail', token=rejectToken, _external=True) }}</h3>
+</body>
+</html>

@@ -43,6 +43,35 @@ class Tailboard_Users(db.Model):
     sign_on_time = db.Column(db.DateTime, index=True) 
     sign_off_time = db.Column(db.DateTime, index=True)
 
+    @staticmethod
+    def verify_refuse_tailboard_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['refuseTailboardEmail']
+        except:
+            return
+        return Tailboard_Users.query.get(id)
+
+    def get_refuse_tailboard_token(self, expires_in=600):
+        return (jwt.encode(
+            {'refuseTailboardEmail': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8'))
+
+
+    def get_accept_tailboard_token(self, expires_in=600):
+        return(jwt.encode(
+                    {'joinTailboardEmail': self.id, 'exp': time() + expires_in},
+                    app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8'))
+
+    @staticmethod
+    def verify_join_tailboard_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                    algorithms=['HS256'])['joinTailboardEmail']
+        except:
+            return
+        return Tailboard_Users.query.get(id)
+
 class Vehicle(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nickname = db.Column(db.String(64), index=True)
@@ -139,7 +168,7 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-
+    
     def get_reset_password_token(self, expires_in=600):
                 return jwt.encode(
                     {'reset_password': self.id, 'exp': time() + expires_in},
