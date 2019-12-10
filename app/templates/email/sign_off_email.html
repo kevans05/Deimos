@@ -2,8 +2,10 @@
 
 <p>
     You accepted Tailboard {{ tailboard.id }}. Please sign off by clicking the following link, when you are done your work:
+</p>
     {{ url_for('signOffTailboardEmail', token=token, _external=True) }}
-
+<br>
+<p>
     Click bellow to view the tailboard:
     {{ url_for('handleArchives',tailboardID=tailboard.id, _external=True) }}
 </p>
