@@ -35,7 +35,7 @@
                         <label for="voltage">Please select the voltages that will be included on this tailboard:</label>
                         <select multiple class="form-control" id="voltage" name="voltage">
                             {% for o in voltage %}
-                                <option value="{{ o.id }}">{{ o.voltage }}
+                                <option value="{{ o.id }}">Phase to Phase Voltage {{ o.voltage }}
                                     - Number of Phases: {{ o.numberOfPhases }} - Number of Wires: {{ o.numberOfWires }} </option>
                             {% endfor %}
                         </select>

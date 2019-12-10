@@ -43,6 +43,11 @@ class Tailboard_Users(db.Model):
     sign_on_time = db.Column(db.DateTime, index=True) 
     sign_off_time = db.Column(db.DateTime, index=True)
 
+    def get_refuse_tailboard_token(self, expires_in=600):
+        return (jwt.encode(
+            {'refuseTailboardEmail': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8'))
+
     @staticmethod
     def verify_refuse_tailboard_token(token):
         try:
@@ -51,12 +56,6 @@ class Tailboard_Users(db.Model):
         except:
             return
         return Tailboard_Users.query.get(id)
-
-    def get_refuse_tailboard_token(self, expires_in=600):
-        return (jwt.encode(
-            {'refuseTailboardEmail': self.id, 'exp': time() + expires_in},
-            app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8'))
-
 
     def get_accept_tailboard_token(self, expires_in=600):
         return(jwt.encode(
@@ -68,6 +67,20 @@ class Tailboard_Users(db.Model):
         try:
             id = jwt.decode(token, app.config['SECRET_KEY'],
                     algorithms=['HS256'])['joinTailboardEmail']
+        except:
+            return
+        return Tailboard_Users.query.get(id)
+
+    def get_sign_off_token(self, expires_in=600):
+        return(jwt.encode(
+                    {'signOffTailboardEmail': self.id, 'exp': time() + expires_in},
+                    app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8'))
+
+    @staticmethod
+    def verify_sign_off_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                    algorithms=['HS256'])['signOffTailboardEmail']
         except:
             return
         return Tailboard_Users.query.get(id)

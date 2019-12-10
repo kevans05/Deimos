@@ -80,28 +80,16 @@ def new_tailboard_email(tailboardID):
                    )
 
 
-def sign_off_email(tailboardID):
-    send_email('[Deimos] Sign off Tailboard - ID:' + str(tailboard.id),
+def sign_off_email(tailboard):
+    tailboard_current = Tailboard.query.filter_by(id=tailboard.tailboard_id).first()
+    user_current = User.query.filter_by(id=tailboard.user_id).first()
+    send_email('[Deimos] Sign off Tailboard - ID:' + str(tailboard.tailboard_id),
                    sender=app.config['ADMINS'][0],
-                   recipients=[x.email],
-                   text_body=render_template('email/archive_output_email.txt', tailboard=tailboard,
-                           presentUserData = Tailboard_Users.query.join(User).filter((Tailboard_Users.tailboard_id == tailboardID)).all(),
-                           presentVehiclesData = Vehicle.query.filter(Vehicle.tailboard.any(id=tailboardID)).all(),
-                           presentDangerDic = Dangers.query.filter(Dangers.tailboard.any(id=tailboardID)).all(),
-                           controlsBarriersDic = Barriers.query.filter(Barriers.tailboard.any(id=tailboardID)).all(),
-                           voltageDic = Voltages.query.filter(Voltages.tailboard.any(id=tailboardID)).all(),
-                           acceptToken = tailboard_user.get_accept_tailboard_token(),
-                           rejectToken = tailboard_user.get_refuse_tailboard_token(),
-                           timeStamp = datetime(year=1970,month=1,day=1,hour=0,minute=0,second=0,microsecond=0)),
-                   html_body=render_template('email/archive_output_email.html', tailboard=tailboard,
-                           presentUserData = Tailboard_Users.query.join(User).filter((Tailboard_Users.tailboard_id == tailboardID)).all(),
-                           presentVehiclesData = Vehicle.query.filter(Vehicle.tailboard.any(id=tailboardID)).all(),
-                           presentDangerDic = Dangers.query.filter(Dangers.tailboard.any(id=tailboardID)).all(),
-                           controlsBarriersDic = Barriers.query.filter(Barriers.tailboard.any(id=tailboardID)).all(),
-                           voltageDic = Voltages.query.filter(Voltages.tailboard.any(id=tailboardID)).all(),
-                           acceptToken = tailboard_user.get_accept_tailboard_token(),
-                           rejectToken = tailboard_user.get_refuse_tailboard_token(),
-                           timeStamp = datetime(year=1970,month=1,day=1,hour=0,minute=0,second=0,microsecond=0))
+                   recipients=[user_current.email],
+                   text_body=render_template('email/sign_off_email.txt', tailboard=tailboard_current,
+                           user=user_current, token=),
+                   html_body=render_template('email/sign_off_email.html', tailboard=tailboard_current,
+                           user=user_current, token=)
                    )
 
 
