@@ -7,24 +7,8 @@ from flask import render_template, request, redirect, flash, send_from_directory
 from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db
 from app.models import User, Vehicle, Dangers, Barriers, Tailboard, Voltages, Tailboard_Users
-# from .email import newTailboardEmail, managers_email_initiatei
 from .token import confirm_token
 from app.email import send_password_reset_email, new_tailboard_email, sign_off_email
-
-path_d = ["project/dynamic/xlsx"]
-
-
-@app.before_first_request
-def activate_job():
-    for path in path_d:
-        try:
-            os.makedirs(path)
-            print(path)
-        except OSError:
-            print("Creation of the directory %s failed" % path)
-        else:
-            print("Successfully created the directory %s" % path)
-
 
 @app.before_request
 def before_request():
@@ -45,6 +29,17 @@ def per_request_callbacks(response):
     return response
 
 
+####################################################################################################################################
+#-----------------------------------------------------index and in app signing-----------------------------------------------------#
+
+# Function: index
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/')
 @app.route('/index')
 def index():
@@ -65,7 +60,14 @@ def index():
         return render_template('index.html',
                                title='Home')
 
-
+# Function: signOffTailboard
+# ----------------------------
+#   INPUTS:
+#       tailboardID
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/signOffTailboard/<tailboardID>')
 def signOffTailboard(tailboardID):
     tailboardToJoin = Tailboard_Users.query.filter(
@@ -74,13 +76,14 @@ def signOffTailboard(tailboardID):
     db.session.commit()
     return redirect('/')
 
-@app.route('/signOffTailboardEmail/<token>', methods=['GET', 'POST'])
-def signOffTailboardEmail(token):
-    tailboard_user = Tailboard_Users.verify_refuse_tailboard_token(token)
-    tailboard_user.sign_off_time = datetime.utcnow()
-    db.session.commit()
-    return redirect('/')
-
+# Function: joinTailboard
+# ----------------------------
+#   INPUTS:
+#       tailboardID
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/joinTailboard/<tailboardID>')
 def joinTailboard(tailboardID):
     tailboardToJoin = Tailboard_Users.query.filter(
@@ -90,15 +93,14 @@ def joinTailboard(tailboardID):
     sign_off_email(tailboardToJoin.id)
     return redirect('/')
 
-
-@app.route('/joinTailboardEmail/<token>', methods=['GET', 'POST'])
-def joinTailboardEmail(token):
-    tailboard_user = Tailboard_Users.verify_join_tailboard_token(token)
-    tailboard_user.sign_on_time = datetime.utcnow()
-    db.session.commit()
-    tailboard_user(tailboardToJoin.id)
-    return redirect('/')
-
+# Function: refuseTailboard
+# ----------------------------
+#   INPUTS:
+#       tailboardID
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/refuseTailboard/<tailboardID>')
 def refuseTailboard(tailboardID):
     tailboardToJoin = Tailboard_Users.query.filter(
@@ -107,14 +109,17 @@ def refuseTailboard(tailboardID):
     db.session.commit()
     return redirect('/')
 
-@app.route('/refuseTailboardEmail/<token>', methods=['GET', 'POST'])
-def refuseTailboardEmail(token):
-    tailboard_user = Tailboard_Users.verify_refuse_tailboard_token(token)
-    tailboard_user.sign_on_time = datetime(year=1970, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-    db.session.commit()
-    return redirect('/')
+####################################################################################################################################
+#------------------------------------------------------------tailboard-------------------------------------------------------------#
 
-
+# Function: newTailboard
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/newTailboard', methods=['GET', 'POST'])
 @login_required
 def newTailboard():
@@ -152,25 +157,17 @@ def newTailboard():
                            vehicle=vehicle, presentDangers=presentDangers, controlsBarriers=controlBarriers,
                            voltage=voltages)
 
+####################################################################################################################################
+#-------------------------------------------------------------vehicle--------------------------------------------------------------#
 
-@app.route('/handleTailboardEmail/<token>')
-def handleTailboardEmail(token):
-    try:
-        tokenInfo = confirm_token(token)
-    except:
-        flash('The confirmation link is invalid or has expired.', 'danger')
-    db = dataset.connect('sqlite:///project/dynamic/db/database.db')
-    tailboardData = db['tailboard']
-    tailboard = tailboardData.find_one(jobID=tokenInfo[1])
-    if tailboard['presentStaffConfirmed'] is None:
-        presentStaffConfirmed = str(tokenInfo[0]) + ";"
-    else:
-        presentStaffConfirmed = str(tailboard['presentStaffConfirmed']) + str(tokenInfo[0]) + ";"
-    data = dict(jobID=tokenInfo[1], presentStaffConfirmed=presentStaffConfirmed)
-    tailboardData.update(data, ['jobID'])
-    return redirect('/')
-
-
+# Function: newVehicle
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/newVehicle', methods=['GET', 'POST'])
 def newVehicle():
     if request.method == 'POST':
@@ -183,7 +180,14 @@ def newVehicle():
     return render_template('vehicleNew.html',
                            title='New Vehicle')
 
-
+# Function: editVehicle
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/editVehicle', methods=['GET', 'POST'])
 def editVehicle():
     vehicle = Vehicle.query.all()
@@ -198,7 +202,17 @@ def editVehicle():
     return render_template('vehicleEdit.html',
                            title='Edit Vehicle', vehicle=vehicle)
 
+####################################################################################################################################
+#----------------------------------------------------------PresentDangers----------------------------------------------------------#
 
+# Function: newPresentDangers
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/newPresentDangers', methods=['GET', 'POST'])
 def newPresentDangers():
     if request.method == 'POST':
@@ -209,7 +223,14 @@ def newPresentDangers():
     return render_template('presentDangersNew.html',
                            title='New Present Dangers')
 
-
+# Function: editPresentDangers
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/editPresentDangers', methods=['GET', 'POST'])
 def editPresentDangers():
     presentDangers = Dangers.query.all()
@@ -221,7 +242,17 @@ def editPresentDangers():
     return render_template('presentDangersEdit.html',
                            title='Present Danger', presentDangers=presentDangers)
 
+####################################################################################################################################
+#----------------------------------------------------------ControlBarriers---------------------------------------------------------#
 
+# Function: newControlBarriers
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/newControlBarriers', methods=['GET', 'POST'])
 def newControlBarriers():
     if request.method == 'POST':
@@ -232,7 +263,14 @@ def newControlBarriers():
     return render_template('controlsBarriersNew.html',
                            title='New Present Dangers')
 
-
+# Function: editControlBarriers
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/editControlBarriers', methods=['GET', 'POST'])
 def editControlBarriers():
     controlBarriers = Barriers.query.all()
@@ -244,7 +282,17 @@ def editControlBarriers():
     return render_template('controlsBarriersEdit.html',
                            title='Present Danger', controlBarriers=controlBarriers)
 
+####################################################################################################################################
+#--------------------------------------------------------------Voltages------------------------------------------------------------#
 
+# Function: newVoltages
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/newVoltages', methods=['GET', 'POST'])
 def newVoltages():
     if request.method == 'POST':
@@ -256,7 +304,14 @@ def newVoltages():
     return render_template('voltageNew.html',
                            title='New Voltage')
 
-
+# Function: editVoltages
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/editVoltages', methods=['GET', 'POST'])
 def editVoltages():
     voltages = Voltages.query.all()
@@ -271,12 +326,30 @@ def editVoltages():
                            title='Voltages', voltage=voltages)
 
 
+####################################################################################################################################
+#------------------------------------------------------------email settings--------------------------------------------------------#
+
+# Function: emailSettings
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/emailSettings')
 def emailSettings():
     return render_template('emailSettings.html',
                            title='Edit Settings')
 
-
+# Function: handleEmailSettings
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       to be merged into emailSettings
 @app.route('/handleEmailSettings', methods=['POST'])
 def handleEmailSettings():
     if request.method == 'POST':
@@ -297,19 +370,40 @@ def handleEmailSettings():
             json.dump(data, outfile)
     return redirect('/')
 
-
+# Function: adminSettings
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/adminSettings')
 def adminSettings():
     return render_template('adminSettings.html',
                            title='Admin Settings')
 
-
+# Function: reminderSettings
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/reminderSettings')
 def reminderSettings():
     return render_template('reminderSettings.html',
                            title='Admin Settings')
 
-
+# Function: handleReminderSettings
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       to be merged into reminderSettings
 @app.route('/handleReminderSettings', methods=['POST'])
 def handleReminderSettings():
     if request.method == 'POST':
@@ -319,7 +413,17 @@ def handleReminderSettings():
             json.dump(data, outfile)
     return redirect('/')
 
+####################################################################################################################################
+#---------------------------------------------------------------archives-----------------------------------------------------------#
 
+# Function: archives
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/archives')
 def archives():
     tailboards = Tailboard.query.all()
@@ -327,7 +431,14 @@ def archives():
     return render_template('archives.html',
                            title='archives', page='archives', tailboards=tailboards)
 
-
+# Function: archives
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/handleArchives/<tailboardID>')
 def handleArchives(tailboardID):
     tailboard_current = Tailboard.query.filter_by(id=tailboardID).first()
@@ -342,12 +453,33 @@ def handleArchives(tailboardID):
                            timeStamp=datetime(year=1970, month=1, day=1, hour=0, minute=0, second=0, microsecond=0))
 
 
+####################################################################################################################################
+#-----------------------------------------------------------------about------------------------------------------------------------#
+
+# Function: about
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/about')
 def about():
     return render_template('about.html',
                            title='about', page='about')
 
+####################################################################################################################################
+#---------------------------------------------------------------passwords----------------------------------------------------------#
 
+# Function: reset_password_request
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
     if current_user.is_authenticated:
@@ -361,7 +493,14 @@ def reset_password_request():
     return render_template('reset_password_request.html',
                            title='Reset Password')
 
-
+# Function: reset_password
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
@@ -376,7 +515,14 @@ def reset_password(token):
         return redirect(url_for('login'))
     return render_template('reset_password.html')
 
-
+# Function: login
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -393,7 +539,14 @@ def login():
         return redirect(next_page)
     return render_template('login.html', title='Sign In')
 
-
+# Function: register
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -409,19 +562,40 @@ def register():
         return redirect('login')
     return render_template('register.html', title='Register')
 
-
+# Function: logout
+# ----------------------------
+#   INPUTS:
+#       0
+#   RETURNS:
+#       0
+#   DESCRIPTION:
+#       0
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
+####################################################################################################################################
+#--------------------------------------------------------------EMAILS--------------------------------------------------------------#
 
-@app.route('/exportDataBase.xlsx')
-def exportDataBase():
-    filename = str(int(time())) + 'databaseExport.csv'
-    fileLocation = 'dynamic/xlsx/'
-    fileNameCreatWorkbook = fileLocation + filename
+@app.route('/signOffTailboardEmail/<token>', methods=['GET', 'POST'])
+def signOffTailboardEmail(token):
+    tailboard_user = Tailboard_Users.verify_refuse_tailboard_token(token)
+    tailboard_user.sign_off_time = datetime.utcnow()
+    db.session.commit()
+    return redirect('/')
 
-    tailboards = Tailboard.query.all()
+@app.route('/joinTailboardEmail/<token>', methods=['GET', 'POST'])
+def joinTailboardEmail(token):
+    tailboard_user = Tailboard_Users.verify_join_tailboard_token(token)
+    tailboard_user.sign_on_time = datetime.utcnow()
+    db.session.commit()
+    return redirect('/')
 
-    return redirect(url_for('index'))
+@app.route('/refuseTailboardEmail/<token>', methods=['GET', 'POST'])
+def refuseTailboardEmail(token):
+    tailboard_user = Tailboard_Users.verify_refuse_tailboard_token(token)
+    tailboard_user.sign_on_time = datetime(year=1970, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    db.session.commit()
+    return redirect('/')
+    

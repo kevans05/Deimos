@@ -86,8 +86,6 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuReports">
                             <a class="dropdown-item" href="{{ url_for('archives') }}">Tailboard Archives</a>
-                            <a class="dropdown-item" href="{{ url_for('exportDataBase') }}">Export Entire Database to Excel</a>
-                            <a class="dropdown-item disabled" href="#">Statistics</a>
                         </div>
                     </li>
 
@@ -96,9 +94,9 @@
                             Settings
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuSettings">
-                            <a class="dropdown-item" href="{{ 'emailSettings' }}">Email Settings</a>
-                            <a class="dropdown-item" href="{{ 'adminSettings' }}">Admin Settings</a>
-                            <a class="dropdown-item" href="{{ 'reminderSettings' }}">Reminder Settings</a>
+                            <a class="dropdown-item disabled" href="{{ 'emailSettings' }}">Email Settings</a>
+                            <a class="dropdown-item disabled" href="{{ 'adminSettings' }}">Admin Settings</a>
+                            <a class="dropdown-item disabled" href="{{ 'reminderSettings' }}">Reminder Settings</a>
                         </div>
                     </li>
 		    {% endif %}
