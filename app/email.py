@@ -81,15 +81,17 @@ def new_tailboard_email(tailboardID):
 
 
 def sign_off_email(tailboard):
+    tailboard_user = Tailboard_Users.query.filter((Tailboard_Users.user_id == x.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
     tailboard_current = Tailboard.query.filter_by(id=tailboard.tailboard_id).first()
     user_current = User.query.filter_by(id=tailboard.user_id).first()
+    
     send_email('[Deimos] Sign off Tailboard - ID:' + str(tailboard.tailboard_id),
                    sender=app.config['ADMINS'][0],
                    recipients=[user_current.email],
                    text_body=render_template('email/sign_off_email.txt', tailboard=tailboard_current,
-                           user=user_current, token=),
+                           user=user_current, token=tailboard_user.get_sign_off_token()),
                    html_body=render_template('email/sign_off_email.html', tailboard=tailboard_current,
-                           user=user_current, token=)
+                           user=user_current, token=tailboard_user.get_sign_off_token())
                    )
 
 
