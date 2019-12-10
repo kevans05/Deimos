@@ -90,7 +90,7 @@ def joinTailboard(tailboardID):
         (Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
     tailboardToJoin.sign_on_time = datetime.utcnow()
     db.session.commit()
-    sign_off_email(tailboardToJoin.id)
+    sign_off_email(tailboardToJoin)
     return redirect('/')
 
 # Function: refuseTailboard
@@ -590,6 +590,7 @@ def joinTailboardEmail(token):
     tailboard_user = Tailboard_Users.verify_join_tailboard_token(token)
     tailboard_user.sign_on_time = datetime.utcnow()
     db.session.commit()
+    sign_off_email(tailboard_user)
     return redirect('/')
 
 @app.route('/refuseTailboardEmail/<token>', methods=['GET', 'POST'])
