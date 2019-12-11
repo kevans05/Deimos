@@ -2071,12 +2071,12 @@ pre code {
 }
 
 .form-control::-webkit-input-placeholder {
-  color: #6c757d;
+  color: #bfc9d1;
   opacity: 1;
 }
 
 .form-control::-moz-placeholder {
-  color: #6c757d;
+  color: #bfc9d1;
   opacity: 1;
 }
 
