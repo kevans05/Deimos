@@ -23,10 +23,10 @@
 						<td>{{ moment(o.timestamp).format('lll') }}</td>
 						<td>{{ o.location }}</td>
 						<td>
-							<button type="button" class="btn btn-info"  onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,scrollbars=yes,status=yes');">View</button>
+							<button type="button" class="btn btn-info"  style="width: 100%" onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,scrollbars=yes,status=yes');">View</button>
 						</td>	
 						<td>
-							<button type="button" class="btn btn-success" onclick="window.open('{{ url_for('signOffTailboard',tailboardID=o.id) }}', '_self');">Accept</button>
+							<button type="button" class="btn btn-success"  style="width: 100%" onclick="window.open('{{ url_for('signOffTailboard',tailboardID=o.id) }}', '_self');">Accept</button>
 						</td>
 
 					</tr>
