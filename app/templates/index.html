@@ -20,8 +20,8 @@
 					{% for o in workingTailboards %}
 					<tr>
 						<td><center> {{ o.id }}</center></td>
-						<td>{{ moment(o.timestamp).format('lll') }}</td>
-						<td>{{ o.location }}</td>
+						<td><center>{{ moment(o.timestamp).format('lll') }}</center></td>
+						<td><center>{{ o.location }}</center></td>
 						<td>
 							<button type="button" class="btn btn-info"  style="width: 100%" onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,scrollbars=yes,status=yes');">View</button>
 						</td>	
@@ -51,8 +51,8 @@
 					{% for o in myTailboards %}
 					<tr>
 						<td><center> {{ o.id }}</center></td>
-						<td>{{ moment(o.timestamp).format('lll') }}</td>
-						<td>{{ o.location }}</td>
+						<td><center>{{ moment(o.timestamp).format('lll') }}</center></td>
+						<td><center>{{ o.location }}</center></td>
 						<td align="center">
 							<button type="button" class="btn btn-info"  style="width: 100%" onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">View</button>
 						</td>

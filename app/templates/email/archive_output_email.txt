@@ -37,11 +37,11 @@ Job Steps
 
 --------------------------------------------
 Hazards
-{{ tailboard.hazards }}
+{{ tailboard.jobHazards }}
 
 --------------------------------------------
 Protections
-{{ tailboard.barrriersMitigation }}
+{{ tailboard.jobProtectios }}
 
 --------------------------------------------
 
