@@ -9,7 +9,7 @@
 			<table id="archiveInfo" class="tablesorter" style="width: 100%">
 				<thead>
 					<tr>
-						<th style="width: 5%"> <center>Tailboard ID<br>  </center></th>
+						<th style="width: 3%"> <center>Tailboard ID<br>  </center></th>
 						<th style="width: 7.5%"> <center>Date  </center> </th>
 						<th> <center> Location<br>  </center></th>
 						<th style="width: 10%"> <center>View Tailboard </center> </th>
@@ -19,7 +19,7 @@
 				<tbody>
 					{% for o in workingTailboards %}
 					<tr>
-						<td>{{ o.id }}</td>
+						<td><center> {{ o.id }}</center></td>
 						<td>{{ moment(o.timestamp).format('lll') }}</td>
 						<td>{{ o.location }}</td>
 						<td>
@@ -39,7 +39,7 @@
 			<table id="archiveInfo" class="tablesorter" style="width: 100%">
 				<thead>
 					<tr>
-						<th style="width: 5%"> <center> Tailboard ID<br></center></th>
+						<th style="width: 3%"> <center> Tailboard ID<br></center></th>
 						<th style="width: 7.5%"> <center> Date </center></th>
 						<th> <center> Location<br> </center> </th>
 						<th style="width: 10%"> <center>View Tailboard</center></th>
@@ -50,7 +50,7 @@
 				<tbody>
 					{% for o in myTailboards %}
 					<tr>
-						<td>{{ o.id }}</td>
+						<td><center> {{ o.id }}</center></td>
 						<td>{{ moment(o.timestamp).format('lll') }}</td>
 						<td>{{ o.location }}</td>
 						<td align="center">
