@@ -42,9 +42,9 @@
 						<th>Tailboard ID<br></th>
 						<th>Date</th>
 						<th>Location<br></th>
-						<th align="center">View Tailboard</th>
-						<th align="center">Join the Tailboard</th>
-						<th align="center">Refuse this Tailboard</th>
+						<thstyle="width: 10%"> <center>View Tailboard</center></th>
+						<th style="width: 10%"> <center>Join the Tailboard</center></th>
+						<th style="width: 10%"> <center>Refuse this Tailboard</center></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -54,13 +54,13 @@
 						<td>{{ moment(o.timestamp).format('lll') }}</td>
 						<td>{{ o.location }}</td>
 						<td align="center">
-							<button type="button" class="btn btn-info" onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">View</button>
+							<button type="button" class="btn btn-info"  style="width: 100%" onclick="window.open('{{ url_for('handleArchives',tailboardID=o.id) }}', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');">View</button>
 						</td>
 						<td align="center">
-							<button type="button" class="btn btn-success" onclick="window.open('{{ url_for('joinTailboard',tailboardID=o.id) }}', '_self');">Accept</button>
+							<button type="button" class="btn btn-success"  style="width: 100%" onclick="window.open('{{ url_for('joinTailboard',tailboardID=o.id) }}', '_self');">Accept</button>
 						</td>
 						<td align="center">
-							<button type="button" class="btn btn-danger" onclick="window.open('{{ url_for('refuseTailboard',tailboardID=o.id) }}', '_self');">Reject</button>
+							<button type="button" class="btn btn-danger"  style="width: 100%" onclick="window.open('{{ url_for('refuseTailboard',tailboardID=o.id) }}', '_self');">Reject</button>
 						</td>
 
 					</tr>
