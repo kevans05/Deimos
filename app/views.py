@@ -569,22 +569,25 @@ def logout():
 @app.route('/signOffTailboardEmail/<token>', methods=['GET', 'POST'])
 def signOffTailboardEmail(token):
     tailboard_user = Tailboard_Users.verify_sign_off_token(token)
-    tailboard_user.sign_off_time = datetime.utcnow()
-    db.session.commit()
+    if tailboard_user.sign_off_time is not None or tailboard_user is not None:
+        tailboard_user.sign_off_time = datetime.utcnow()
+        db.session.commit()
     return redirect('/')
 
 @app.route('/joinTailboardEmail/<token>', methods=['GET', 'POST'])
 def joinTailboardEmail(token):
     tailboard_user = Tailboard_Users.verify_join_tailboard_token(token)
-    tailboard_user.sign_on_time = datetime.utcnow()
-    db.session.commit()
-    sign_off_email(tailboard_user)
+    if tailboard_user.sign_on_time is not None or tailboard_user is not None:
+        tailboard_user.sign_on_time = datetime.utcnow()
+        db.session.commit()
+        sign_off_email(tailboard_user)
     return redirect('/')
 
 @app.route('/refuseTailboardEmail/<token>', methods=['GET', 'POST'])
 def refuseTailboardEmail(token):
     tailboard_user = Tailboard_Users.verify_refuse_tailboard_token(token)
-    tailboard_user.sign_on_time = datetime(year=1970, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-    db.session.commit()
+    if tailboard_user.sign_on_time is not None or tailboard_user is not None:
+        tailboard_user.sign_on_time = datetime(year=1970, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        db.session.commit()
     return redirect('/')
     
