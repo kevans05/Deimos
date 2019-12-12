@@ -569,7 +569,7 @@ def logout():
 @app.route('/signOffTailboardEmail/<token>', methods=['GET', 'POST'])
 def signOffTailboardEmail(token):
     tailboard_user = Tailboard_Users.verify_sign_off_token(token)
-    if tailboard_user is not None::
+    if tailboard_user is not None:
         if tailboard_user.sign_off_time is not None:
             tailboard_user.sign_off_time = datetime.utcnow()
             db.session.commit()
