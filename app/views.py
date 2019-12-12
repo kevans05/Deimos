@@ -16,19 +16,6 @@ def before_request():
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
 
-
-@app.after_request
-def per_request_callbacks(response):
-    mydir = 'project/dynamic/xlsx/'
-    if os.listdir(mydir) == "":
-        return 0
-    else:
-        filelist = [f for f in os.listdir(mydir) if f.endswith(".xlsx")]
-        for f in filelist:
-            os.remove(os.path.join(mydir, f))
-    return response
-
-
 ####################################################################################################################################
 #-----------------------------------------------------index and in app signing-----------------------------------------------------#
 
@@ -72,8 +59,9 @@ def index():
 def signOffTailboard(tailboardID):
     tailboardToJoin = Tailboard_Users.query.filter(
         (Tailboard_Users.user_id == current_user.id) & (Tailboard_Users.tailboard_id == tailboardID)).first()
-    tailboardToJoin.sign_off_time = datetime.utcnow()
-    db.session.commit()
+    if tailboardToJoin.sign_off_time is not None:
+        tailboardToJoin.sign_off_time = datetime.utcnow()
+        db.session.commit()
     return redirect('/')
 
 # Function: joinTailboard
